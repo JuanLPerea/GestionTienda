@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Nuevo Producto"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/nombreProductoET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Nombre Producto"
+        android:inputType="text" />
+
+
+    <EditText
+        android:id="@+id/codigoProductoET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Código de producto"
+        android:inputType="text" />
+
+
+    <EditText
+        android:id="@+id/precioCompraET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Precio de compra"
+        android:inputType="numberDecimal"
+        android:numeric="decimal" />
+
+
+    <EditText
+        android:id="@+id/precioVentaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Precio de venta"
+        android:inputType="numberDecimal"
+        android:numeric="decimal" />
+
+    <EditText
+        android:id="@+id/ivaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="IVA"
+        android:inputType="number|text"
+        android:maxLength="2"
+        android:numeric="integer" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/fotoProductoIB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:gravity="center"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
+
+        <ImageView
+            android:id="@+id/productoNuevoIV"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/nophoto" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/boton_guardar_producto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Guardar" />
+
+        <Button
+            android:id="@+id/boton_cancelar_producto"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:layout_weight="1"
+            android:text="CANCELAR" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="400dp"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

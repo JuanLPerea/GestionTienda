@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Mi Tienda"
+        android:textSize="24sp" />
+
+    <EditText
+        android:id="@+id/nombreTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Nombre"
+        android:inputType="text" />
+
+
+    <EditText
+        android:id="@+id/direccionTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Dirección"
+        android:inputType="text" />
+
+
+    <EditText
+        android:id="@+id/telefonoTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Teléfono"
+        android:inputType="text" />
+
+
+    <EditText
+        android:id="@+id/emailTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="e-mail"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/cifTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="CIF"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/otrosdatosTiendaET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="Otros Datos"
+        android:inputType="text" />
+
+
+    <Button
+        android:id="@+id/boton_guardar_tienda"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center"
+        android:text="Guardar" />
+
+    <Space
+        android:layout_width="400dp"
+        android:layout_height="wrap_content" />
+</LinearLayout>
