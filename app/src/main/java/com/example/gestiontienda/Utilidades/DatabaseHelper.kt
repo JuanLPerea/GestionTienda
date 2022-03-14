@@ -209,18 +209,25 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
                     filtrarAdd = true
                 } else {
                     // si filtramos por nombre, añadir si contiene el texto buscado
-                    if (!nombreFiltrar.equals("") && productoTMP.nombreProducto.contains(nombreFiltrar)) {
+                    if (!nombreFiltrar.equals("") && productoTMP.nombreProducto.uppercase().contains(nombreFiltrar.uppercase())) {
                         filtrarAdd = true
+                    } else {
+                        // si filtramos por codigo producto, añadir si contiene el texto buscado
+                        if (!codigoFiltrar.equals("") && productoTMP.codigoProducto.uppercase().contains(codigoFiltrar.uppercase())) {
+                            filtrarAdd = true
+                        }
                     }
-                    // si filtramos por codigo producto, añadir si contiene el texto buscado
-                    if (!nombreFiltrar.equals("") && productoTMP.codigoProducto.contains(codigoFiltrar)) {
-                        filtrarAdd = true
-                    }
+
                 }
                 if (filtrarAdd) misProductos.add(productoTMP)
             } while (datosBruto.moveToNext())
         }
         datosBruto.close()
+
+        if (misProductos.size == 0) {
+            misProductos.add(Producto("No se encuentra Producto", "","",0,00f,0f,0))
+        }
+
         return misProductos
     }
 

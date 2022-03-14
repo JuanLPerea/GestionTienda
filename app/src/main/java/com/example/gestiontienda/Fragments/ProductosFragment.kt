@@ -11,6 +11,8 @@ import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -36,13 +38,24 @@ class ProductosFragment : Fragment(), OnItemListClicked {
     private lateinit var rutaImagenNuevoProducto : String
     private lateinit var vistaFragment : Dialog
     private lateinit var bitmapFoto : Bitmap
+    private lateinit var buscarNombre : EditText
+    private lateinit var buscarCodigo : EditText
+    private lateinit var imagenProductoSeleccionado : ImageView
+    private lateinit var nombreProductoSeleccionado : TextView
+    private lateinit var stockProductoSeleccionado : TextView
+    private lateinit var precioVentaProductoSeleccionado : EditText
     val mAdapter: RecyclerAdapter = RecyclerAdapter()
     var listaProductos: MutableList<Producto> = mutableListOf()
-    lateinit var listenerItemClick: OnItemListClicked
-
+    private lateinit var productoSeleccionado : Producto
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.fragment_productos, container, false)
+
+        // Views
+        imagenProductoSeleccionado = v.findViewById(R.id.imagenProductoSeleccionado) as ImageView
+        nombreProductoSeleccionado = v.findViewById(R.id.nombreProductoSeleccionado) as TextView
+        stockProductoSeleccionado = v.findViewById(R.id.StockProductoSeleccionado) as TextView
+        precioVentaProductoSeleccionado = v.findViewById(R.id.PrecioVentaProductoSeleccionado) as EditText
 
         // Instanciar Base de Datos SQLite
         databaseHelper = DatabaseHelper(activity!!.applicationContext)
@@ -66,9 +79,37 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         mAdapter.RecyclerAdapter(listaProductos, v.context, this)
         mRecyclerView.adapter = mAdapter
 
+        // Buscar por nombre producto
+        buscarNombre = v.findViewById(R.id.buscarNombreProducto) as EditText
+        buscarNombre.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                productoSeleccionado = databaseHelper.obtenerProductos(db, buscarNombre.text.toString(), "").first()
+                actualizarProductoSeleccionado()
+            }
+
+        })
+
+        buscarCodigo = v.findViewById(R.id.buscarCodigoProducto) as EditText
+        buscarCodigo.addTextChangedListener(object  : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                productoSeleccionado = databaseHelper.obtenerProductos(db, "", buscarCodigo.text.toString()).first()
+                actualizarProductoSeleccionado()
+            }
+        })
 
 
         return v
+    }
+
+    private fun actualizarProductoSeleccionado() {
+        imagenProductoSeleccionado.setImageBitmap(ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoSeleccionado.rutafotoProducto))
+        nombreProductoSeleccionado.text = productoSeleccionado.nombreProducto
+        stockProductoSeleccionado.text = productoSeleccionado.stockProducto.toString()
+        precioVentaProductoSeleccionado.setText( productoSeleccionado.precioVentaProducto.toString())
     }
 
     private fun nuevoProducto(v : View) {
@@ -239,9 +280,10 @@ class ProductosFragment : Fragment(), OnItemListClicked {
 
     }
 
-    override fun itemListClicked(codigoProducto: String, itemView: View) {
-        Toast.makeText(activity!!.applicationContext, "Pulsado el producto: " + codigoProducto, Toast.LENGTH_LONG).show()
-
+    override fun itemListClicked(producto: Producto, itemView: View) {
+        Toast.makeText(activity!!.applicationContext, "Pulsado el producto: " + producto.nombreProducto, Toast.LENGTH_LONG).show()
+        productoSeleccionado = producto
+        actualizarProductoSeleccionado()
     }
 
 

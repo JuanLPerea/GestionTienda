@@ -30,7 +30,7 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         val item = productos.get(position)
         holder.bind(item , context)
         holder.itemView.setOnClickListener {
-            listener.itemListClicked(item.codigoProducto , holder.itemView)
+            listener.itemListClicked(item , holder.itemView)
         }
     }
 
