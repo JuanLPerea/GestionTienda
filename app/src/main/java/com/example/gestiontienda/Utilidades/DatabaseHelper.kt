@@ -102,6 +102,14 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         db!!.execSQL(CREATE_TABLE_ENTRADAS)
         db!!.execSQL(CREATE_TABLE_CAJA)
         db!!.execSQL(CREATE_TABLE_BANCO)
+
+        // CREAR UN PRODUCTO MODELO
+        val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('PRODUCTO' , '0' , '-' , '0' , '0' , '0' , '0')"
+        db!!.execSQL(CREAR_PRODUCTO)
+
+        // CREAR UN PROVEEDOR MODELO
+        val CREAR_PROVEEDOR = "INSERT INTO PROVEEDORES VALUES('1' , 'PROVEEDOR' , '-' , '0' , '0' , '0' , '0', '0', '0', '0', '0')"
+        db!!.execSQL(CREAR_PROVEEDOR)
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -138,8 +146,8 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
     }
 
     fun crearProducto (db: SQLiteDatabase, producto: Producto) {
-        val CREATE_TIENDA = "INSERT INTO PRODUCTOS VALUES('" + producto.nombreProducto + "' , '" + producto.codigoProducto + "' , '"  + producto.rutafotoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + producto.precioVentaProducto + "' , '" + producto.ivaProducto + "')"
-        db!!.execSQL(CREATE_TIENDA)
+        val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('" + producto.nombreProducto + "' , '" + producto.codigoProducto + "' , '"  + producto.rutafotoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + producto.precioVentaProducto + "' , '" + producto.ivaProducto + "')"
+        db!!.execSQL(CREAR_PRODUCTO)
         Log.d("Miapp" , "Nuevo producto añadido")
     }
 
@@ -229,6 +237,28 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         }
 
         return misProductos
+    }
+
+    fun darEntradaListaProductos(db:SQLiteDatabase , listaProductosEntrada: MutableList<Producto>) {
+
+      // Actualizar cada producto sumando al stock las unidades que entran y el precio de compra al último
+
+      // Añadir a la tabla de entradas los movimientos
+
+
+    }
+
+    fun obtenerProveedoresString(db : SQLiteDatabase): ArrayList<String> {
+        var listaNombresProveedores : ArrayList<String> = arrayListOf()
+        val datosBruto = db.rawQuery("SELECT * FROM PROVEEDORES", null)
+        if (datosBruto!!.moveToFirst()) {
+            do {
+                val nombreTMP = datosBruto.getString(datosBruto.getColumnIndex("NOMBREPROVEEDOR"))
+                listaNombresProveedores.add(nombreTMP)
+            } while (datosBruto.moveToNext())
+        }
+        datosBruto.close()
+        return listaNombresProveedores
     }
 
 

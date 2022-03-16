@@ -51,7 +51,7 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
         val stockProducto = view.findViewById(R.id.stockproducto_fila) as TextView
         val ivaProducto = view.findViewById(R.id.ivaproducto_fila) as TextView
         val imagenProducto = view.findViewById(R.id.imagen_producto_fila) as ImageView
-        val linearBase = view.findViewById(R.id.linear_base_fila) as LinearLayout
+      //  val linearBase = view.findViewById(R.id.linear_base_fila) as LinearLayout
 
 
         fun bind(producto: Producto, context: Context) {
@@ -61,8 +61,15 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
             precioVentaProducto.text = producto.precioVentaProducto.toString()
             stockProducto.text = producto.stockProducto.toString()
             ivaProducto.text = producto.ivaProducto.toString()
-            imagenProducto.setImageBitmap(imagesHelper.recuperarImagenMemoriaInterna(producto.rutafotoProducto))
-            linearBase.setBackgroundColor(Color.rgb((0..255).shuffled().last(),(0..255).shuffled().last(),(0..255).shuffled().last()))
+
+            val imagen = imagesHelper.recuperarImagenMemoriaInterna(producto.rutafotoProducto)
+            if (imagen == null) {
+                imagenProducto.setImageResource(R.drawable.nophoto)
+            } else {
+                imagenProducto.setImageBitmap(imagen)
+            }
+
+           // linearBase.setBackgroundColor(Color.rgb((0..255).shuffled().last(),(0..255).shuffled().last(),(0..255).shuffled().last()))
         }
     }
 

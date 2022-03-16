@@ -67,7 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:orientation="horizontal">
 
             <ImageView
@@ -91,15 +91,17 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Stock" />
+                android:text="Stock"
+                android:textSize="18sp" />
 
             <EditText
-                android:id="@+id/PrecioVentaProductoSeleccionado"
+                android:id="@+id/PrecioCompraProductoSeleccionado"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:hint="Precio" />
+                android:hint="Precio"
+                android:inputType="numberDecimal" />
         </LinearLayout>
 
         <LinearLayout
@@ -107,6 +109,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="10dp"
             android:layout_weight="2"
+            android:gravity="center"
             android:orientation="horizontal">
 
             <TextView
@@ -117,49 +120,64 @@
                 android:gravity="center"
                 android:text="Cantidad" />
 
-            <TextView
-                android:id="@+id/textView4"
+            <EditText
+                android:id="@+id/cantidadET"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
                 android:background="#FFEB3B"
                 android:gravity="center"
+                android:inputType="numberDecimal"
                 android:text="1"
                 android:textColor="#000000"
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/button6"
+                android:id="@+id/botonMenos"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="-" />
 
             <Button
-                android:id="@+id/button5"
+                android:id="@+id/botonMas"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="+" />
 
             <Button
-                android:id="@+id/buttonAdd"
+                android:id="@+id/botonEntrada"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:text="AÑADIR" />
+                android:text="ENTRADA" />
         </LinearLayout>
 
-        <FrameLayout
+        <TextView
+            android:id="@+id/carpetaTV"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="15">
+            android:layout_weight="1"
+            android:background="@drawable/carpeta1"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:text="Productos en stock"
+            android:textColor="@color/black"
+            app:autoSizeTextType="uniform" />
+
+        <FrameLayout
+            android:id="@+id/frameProductos"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="15"
+            android:background="@color/crema">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycler_productosRV"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#EAE7C8" />
+                android:layout_height="match_parent" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/floatingActionButtonEntrada"
@@ -168,18 +186,21 @@
                 android:layout_gravity="bottom|right"
                 android:layout_margin="10dp"
                 android:clickable="true"
+                android:visibility="invisible"
                 app:srcCompat="@android:drawable/checkbox_on_background" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/floatingActionButtonAdd"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
+                android:layout_gravity="bottom|right"
                 android:layout_margin="10dp"
                 android:clickable="true"
                 app:srcCompat="@android:drawable/ic_menu_add" />
 
         </FrameLayout>
+
+
 
     </LinearLayout>
 
