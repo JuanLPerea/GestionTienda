@@ -9,6 +9,9 @@ import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,7 +20,9 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestiontienda.Adapters.RecyclerAdapter
@@ -92,7 +97,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
 
         val botonNuevoProducto = v.findViewById(R.id.floatingActionButtonAdd) as FloatingActionButton
         botonNuevoProducto.setOnClickListener {
-            nuevoProducto(v)
+            editarProducto(v, true , "")
         }
 
         // Recycler View
@@ -107,6 +112,76 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         // Recycler adapter
         mAdapter.RecyclerAdapter(listaProductos, v.context, this)
         mRecyclerView.adapter = mAdapter
+
+        val simpleItemTouchCallback = object : ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT) {
+            override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+                Log.d("Miapp" , "Mover fila")
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+
+                if (carpeta) {
+                    if (direction == ItemTouchHelper.LEFT) {
+                        // Swipe hacia la izquierda editar
+                        editarProducto(v, false , listaProductos.get(position).codigoProducto)
+                        carpetaClick()
+                    } else {
+                        // Swipe hacia la derecha borrar
+                        showDialogConfirmarBorrar(position)
+                        carpetaClick()
+                    }
+                } else {
+                    if (direction == ItemTouchHelper.RIGHT) {
+                        listaProductosEntrada.removeAt(position)
+                        carpetaClick()
+                    } else {
+                        carpetaClick()
+                    }
+                }
+            }
+
+            override fun onChildDraw(c: Canvas, recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, dX: Float, dY: Float, actionState: Int, isCurrentlyActive: Boolean
+            ) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
+
+                var icon = ContextCompat.getDrawable(mAdapter.context, R.drawable.ic_baseline_delete_24);
+                var background =  ColorDrawable(Color.RED);
+
+                val itemView = viewHolder.itemView
+                val backgroundCornerOffset = 20
+                val iconMargin = (itemView.getHeight() - icon!!.getIntrinsicHeight()) / 2
+                val iconTop = itemView.getTop() + (itemView.getHeight() - icon.getIntrinsicHeight()) / 2
+                val iconBottom = iconTop + icon.getIntrinsicHeight()
+
+                if (dX > 0) {
+                    val iconLeft = itemView.getLeft() + iconMargin
+                    val iconRight = itemView.getLeft() + icon.intrinsicWidth + iconMargin
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.setBounds(itemView.getLeft(), itemView.getTop(),itemView.getLeft() + (dX.toInt()) + backgroundCornerOffset, itemView.getBottom())
+                } else if (dX < 0) { // Swiping to the left
+                    background =  ColorDrawable(Color.GREEN);
+                    if (carpeta) {
+                        icon = ContextCompat.getDrawable(mAdapter.context, R.drawable.ic_baseline_create_24)
+                    } else {
+                        icon = ContextCompat.getDrawable(mAdapter.context, R.drawable.ic_baseline_cancel_24)
+                    }
+
+                    val iconLeft = itemView.getRight() - iconMargin - icon!!.getIntrinsicWidth()
+                    val iconRight = itemView.getRight() - iconMargin
+                    icon.setBounds(iconLeft, iconTop, iconRight, iconBottom)
+                    background.setBounds(itemView.getRight() + (dX.toInt()) - backgroundCornerOffset, itemView.getTop(), itemView.getRight(), itemView.getBottom())
+                } else { // view is unSwiped
+                    background.setBounds(0, 0, 0, 0);
+                }
+                background.draw(c);
+                icon.draw(c);
+            }
+        }
+
+        val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(mRecyclerView)
 
         // Buscar por nombre producto
         buscarNombre = v.findViewById(R.id.buscarNombreProducto) as EditText
@@ -176,11 +251,41 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         return v
     }
 
+    private fun showDialogConfirmarBorrar(position: Int) {
+        val dialog = Dialog(miContexto)
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        dialog.setCancelable(false)
+        dialog.setContentView(R.layout.confirmar_layout)
+
+        val textoConfirmar = dialog.findViewById(R.id.texto_confirmarTV) as TextView
+        val botonConfirmarOK = dialog.findViewById(R.id.boton_confirmar_OK) as Button
+        val botonConfirmarCancelar = dialog.findViewById(R.id.boton_confirmar_CANCELAR) as Button
+
+        textoConfirmar.setText("Confirmar borrar el producto. (No se puede deshacer)")
+        botonConfirmarOK.setOnClickListener {
+            databaseHelper.borrarProducto(db, listaProductos.get(position))
+            Toast.makeText(dialog.context, "Producto Borrado", Toast.LENGTH_LONG).show()
+            listaProductos = databaseHelper.obtenerProductos(db, "", "")
+            mAdapter.notifyDataSetChanged()
+            carpetaClick()
+            dialog.dismiss()
+        }
+
+        botonConfirmarCancelar.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+
     private fun aceptarEntrada() {
         val dialog = Dialog(miContexto , android.R.style.Theme_NoTitleBar_Fullscreen)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.entrada_productos)
+
+        var proveedor = databaseHelper.obtenerProveedores(db).first()
 
         val tablaEntrada = dialog.findViewById(R.id.tablaProductos) as TableLayout
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
@@ -192,6 +297,8 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val totalProductos = dialog.findViewById(R.id.total_productos) as TextView
         val importeTotal = dialog.findViewById(R.id.importeTotalProductos) as TextView
         val seleccionarProveedorIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
+        val proveedorSeleccionado = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
+        proveedorSeleccionado.setText(proveedor.nombreProveedor)
         
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams
@@ -247,9 +354,12 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         }
 
         botonDarEntrada.setOnClickListener { vista ->
-
-
-            databaseHelper.darEntradaListaProductos(db, listaProductosEntrada)
+            databaseHelper.darEntradaListaProductos(db, listaProductosEntrada, proveedor)
+            listaProductos = databaseHelper.obtenerProductos(db, "","")
+            listaProductosEntrada.clear()
+            carpeta = true
+            carpetaClick()
+            dialog.dismiss()
         }
 
         seleccionarProveedorIB.setOnClickListener { vista ->
@@ -258,29 +368,26 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             dialogSeleccionarProveedor.setCancelable(false)
             dialogSeleccionarProveedor.setContentView(R.layout.dialogo_seleccionar)
 
-            val botonAceptarSeleccion = dialogSeleccionarProveedor.findViewById(R.id.aceptar_seleccion) as Button
+            val listaProveedores = databaseHelper.obtenerProveedores(db)
+            val picker = dialogSeleccionarProveedor.findViewById(R.id.tablaSeleccion) as TableLayout
 
-            val listaStrings = databaseHelper.obtenerProveedoresString(db)
-            val picker = dialogSeleccionarProveedor.findViewById(R.id.picker) as NumberPicker
-            picker.minValue = 0
-            picker.maxValue = listaStrings.size-1
-            picker.displayedValues = listaStrings.toTypedArray()
-            picker.descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-
-            botonAceptarSeleccion.setOnClickListener {
-                Log.d("Miapp" , "Proveedor: " + picker.value)
-                dialogSeleccionarProveedor.dismiss()
+            listaProveedores.forEach { proveedorTMP ->
+                val nuevaFila = TableRow(vista.context)
+                val rowProveedor = TextView(vista.context)
+                rowProveedor.setText(proveedorTMP.nombreProveedor)
+                rowProveedor.setOnClickListener {
+                    proveedor = proveedorTMP
+                    proveedorSeleccionado.setText(proveedor.nombreProveedor)
+                    dialogSeleccionarProveedor.dismiss()
+                }
+                nuevaFila.addView(rowProveedor)
+                picker.addView(nuevaFila)
             }
-
             dialogSeleccionarProveedor.show()
         }
-
         dialog.show()
 
     }
-    
-
-
 
     private fun carpetaClick() {
         if (carpeta) {
@@ -290,6 +397,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             frameProductos.setBackgroundColor( resources.getColor(R.color.crema))
             floatingAddButton.visibility = View.VISIBLE
             floatingEntradaButton.visibility = View.INVISIBLE
+            listaProductos = databaseHelper.obtenerProductos(db, "","")
             mAdapter.RecyclerAdapter(listaProductos, miContexto , this)
             mRecyclerView.adapter = mAdapter
             mAdapter.notifyDataSetChanged()
@@ -310,10 +418,10 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         imagenProductoSeleccionado.setImageBitmap(ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoSeleccionado.rutafotoProducto))
         nombreProductoSeleccionado.text = productoSeleccionado.nombreProducto
         stockProductoSeleccionado.text = productoSeleccionado.stockProducto.toString()
-        precioCompraProductoSeleccionado.setText( productoSeleccionado.precioVentaProducto.toString())
+        precioCompraProductoSeleccionado.setText( productoSeleccionado.precioCompraProducto.toString())
     }
 
-    private fun nuevoProducto(v : View) {
+    private fun editarProducto(v : View, nuevo : Boolean, codigoProductoEditado : String) {
         val dialog = Dialog(v.context)
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
         dialog.setCancelable(false)
@@ -321,6 +429,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
 
         vistaFragment = dialog
 
+        val tituloDialogoProducto = dialog.findViewById(R.id.titulo_dialogo_producto) as TextView
         val nombreProducto = dialog.findViewById(R.id.nombreProductoET) as EditText
         val codigoProducto = dialog.findViewById(R.id.codigoProductoET) as EditText
         val precioCompra = dialog.findViewById(R.id.precioCompraET) as EditText
@@ -330,30 +439,50 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val botonGuardar = dialog.findViewById(R.id.boton_guardar_producto) as Button
         val botonFoto = dialog.findViewById(R.id.fotoProductoIB) as ImageButton
         val botonCancelar = dialog.findViewById(R.id.boton_cancelar_producto) as Button
+        val imagenProducto = dialog.findViewById(R.id.productoNuevoIV) as ImageView
+
+        tituloDialogoProducto.setText("Nuevo Producto")
+        if (!nuevo) {
+            val productoTMP = databaseHelper.obtenerProducto(db, codigoProductoEditado)
+            tituloDialogoProducto.setText("Editar Producto")
+            nombreProducto.setText(productoTMP.nombreProducto)
+            codigoProducto.setText(productoTMP.codigoProducto)
+            precioCompra.setText(productoTMP.precioCompraProducto.toString())
+            precioVenta.setText(productoTMP.precioVentaProducto.toString())
+            ivaProducto.setText(productoTMP.ivaProducto.toString())
+            bitmapFoto = ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoTMP.rutafotoProducto) as Bitmap
+            imagenProducto.setImageBitmap(bitmapFoto)
+            rutaImagenNuevoProducto = productoTMP.rutafotoProducto
+        }
 
         botonGuardar.setOnClickListener {
-
             if (nombreProducto.text.toString() == "" || codigoProducto.text.toString() == "" || precioCompra.text.toString() == "" || precioVenta.text.toString() == "" || ivaProducto.text.toString() == "") {
                 Toast.makeText(v.context, "Debes completar todos los datos", Toast.LENGTH_LONG).show()
             } else {
-                if (databaseHelper.productoExiste(db, codigoProducto.text.toString())) {
+                if (databaseHelper.productoExiste(db, codigoProducto.text.toString()) && nuevo) {
                     Toast.makeText(v.context, "Ya existe un producto con este código", Toast.LENGTH_LONG).show()
                 } else {
                     val precioCompraTmp = precioCompra.text.toString().toFloat()
                     val precioVentaTmp =precioVenta.text.toString().toFloat()
                     val ivaTmp = ivaProducto.text.toString().toInt()
 
-                    // Guardar imagen con el codigo de producto
-                    val imagesHelper = ImagesHelper(activity!!.applicationContext)
-                    // guardamos la imagen en la memoria interna
-                    val rutaImagen = imagesHelper.guardarBitmapEnMemoria(activity!!.applicationContext, bitmapFoto, codigoProducto.text.toString())
-                    // Convertimos la ruta del archivo a String y lo guardamos en la BD
-                    rutaImagenNuevoProducto = rutaImagen.toString()
+                    if (nuevo) {
+                        // Guardar imagen con el codigo de producto
+                        val imagesHelper = ImagesHelper(activity!!.applicationContext)
+                        // guardamos la imagen en la memoria interna
+                        val rutaImagen = imagesHelper.guardarBitmapEnMemoria(activity!!.applicationContext, bitmapFoto, codigoProducto.text.toString())
+                        // Convertimos la ruta del archivo a String y lo guardamos en la BD
+                        rutaImagenNuevoProducto = rutaImagen.toString()
+                    }
+
                     val miProducto = Producto(nombreProducto.text.toString(), codigoProducto.text.toString(), rutaImagenNuevoProducto,0, precioCompraTmp, precioVentaTmp, ivaTmp)
                     databaseHelper.crearProducto(db, miProducto)
-                    Toast.makeText(v.context, "Nuevo producto creado", Toast.LENGTH_LONG).show()
-                    listaProductos.add(miProducto)
-                    mAdapter.notifyDataSetChanged()
+                    if (nuevo) {
+                        Toast.makeText(v.context, "Nuevo producto creado", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(v.context, "Producto Actualizado", Toast.LENGTH_LONG).show()
+                    }
+                    carpetaClick()
                     dialog.dismiss()
                 }
 
@@ -362,6 +491,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         }
 
         botonCancelar.setOnClickListener {
+            carpetaClick()
             dialog.dismiss()
         }
 

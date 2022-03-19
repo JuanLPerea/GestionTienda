@@ -33,16 +33,19 @@ class MainActivity : AppCompatActivity() {
             TabLayoutMediator.TabConfigurationStrategy { tab, position ->
                 when (position) {
                     0-> {
-                        tab.text = "Gestión"
                         tab.icon = resources.getDrawable(R.drawable.ic_baseline_home_24)
                     }
                     1-> {
-                        tab.text = "Ventas"
                         tab.icon = resources.getDrawable((R.drawable.ic_baseline_shopping_cart_24))
                     }
                     2-> {
-                        tab.text = "Productos"
                         tab.icon = resources.getDrawable((R.drawable.ic_baseline_store_24))
+                    }
+                    3-> {
+                        tab.icon = resources.getDrawable((R.drawable.ic_baseline_person_24))
+                    }
+                    4 -> {
+                        tab.icon = resources.getDrawable((R.drawable.ic_baseline_local_shipping_24))
                     }
                 }
 

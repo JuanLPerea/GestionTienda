@@ -13,9 +13,7 @@ package com.example.gestiontienda.Entidades
                   EMAIL
                   REFERENCIA
  */
-//"CREATE TABLE PROVEEDORES (IDPROVEEDOR ID, NOMBREPROVEEDOR TEXT, APELLIDOSPROVEEDOR TEXT, DIRECCIONPROVEEDOR TEXT, CIUDADPROVEEDOR TEXT, PROVINCIAPROVEEDOR TEXT, CODIGOPOSTALPROVEEDOR TEXT, CIFPROVEEDOR TEXT, TELEFONOPROVEDOR TEXT, EMAILPROVEEDOR TEXT, REFERENCIAPROVEEDOR TEXT)"
-
-class Proveedor (idProveedor : String, nombreProveedor : String, nombre2Proveedor : String, direccionProveedor : String, ciudadProveedor : String, provinciaProveedor : String, cpProveedor : Int, telefonoProveedor : String, emailProveedor : String, referenciaProveedor : String){
+class Proveedor (idProveedor : String, nombreProveedor : String, nombre2Proveedor : String, direccionProveedor : String, ciudadProveedor : String, provinciaProveedor : String, cpProveedor : Int, telefonoProveedor : String, cifProveedor : String, emailProveedor : String, referenciaProveedor : String){
 
     var idProveedor : String
     var nombreProveedor : String
@@ -25,6 +23,7 @@ class Proveedor (idProveedor : String, nombreProveedor : String, nombre2Proveedo
     var provinciaProveedor : String
     var cpProveedor : Int
     var telefonoProveedor : String
+    var cifProveedor : String
     var emailProveedor : String
     var referenciaProveedor : String
     
@@ -37,6 +36,7 @@ class Proveedor (idProveedor : String, nombreProveedor : String, nombre2Proveedo
         this.provinciaProveedor = provinciaProveedor
         this.cpProveedor = cpProveedor
         this.telefonoProveedor = telefonoProveedor
+        this.cifProveedor = cifProveedor
         this.emailProveedor = emailProveedor
         this.referenciaProveedor = referenciaProveedor
     }

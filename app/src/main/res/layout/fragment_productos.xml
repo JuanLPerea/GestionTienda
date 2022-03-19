@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <TextView
+        android:id="@+id/encabezadoTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Productos"
@@ -19,49 +20,44 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Buscar:" />
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/buscarCodigoProducto"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
-
-            <EditText
-                android:id="@+id/buscarCodigoProducto"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_weight="15"
-                android:hint="Introduce o lee el código del producto"
-                android:background="#EAE7CB" />
-
-        </LinearLayout>
+            android:background="#EAE7CB"
+            android:hint="Código"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black" />
 
 
-        <LinearLayout
+        <EditText
+            android:id="@+id/buscarNombreProducto"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="10dp"
+            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
-            android:orientation="horizontal">
+            android:background="#EAE7CB"
+            android:hint="Nombre"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black" />
 
-            <EditText
-                android:id="@+id/buscarNombreProducto"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_weight="15"
-                android:background="#EAE7CB"
-                android:hint="Introduce el nombre del producto"/>
 
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -124,7 +120,7 @@
                 android:id="@+id/cantidadET"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:background="#FFEB3B"
                 android:gravity="center"
                 android:inputType="numberDecimal"
@@ -150,7 +146,7 @@
                 android:id="@+id/botonEntrada"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="3"
                 android:text="ENTRADA" />
         </LinearLayout>
 
@@ -196,7 +192,7 @@
                 android:layout_gravity="bottom|right"
                 android:layout_margin="10dp"
                 android:clickable="true"
-                app:srcCompat="@android:drawable/ic_menu_add" />
+                android:src="@drawable/ic_baseline_playlist_add_24"/>
 
         </FrameLayout>
 
