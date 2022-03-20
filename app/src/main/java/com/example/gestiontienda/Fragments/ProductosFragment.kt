@@ -92,7 +92,6 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         // Instanciar Base de Datos SQLite
         databaseHelper = DatabaseHelper(activity!!.applicationContext)
         db = databaseHelper.writableDatabase
-
         bitmapFoto = BitmapFactory.decodeResource(activity!!.resources, R.drawable.nophoto)
 
         val botonNuevoProducto = v.findViewById(R.id.floatingActionButtonAdd) as FloatingActionButton
@@ -617,5 +616,8 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         actualizarProductoSeleccionado()
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        carpetaClick()
+    }
 }

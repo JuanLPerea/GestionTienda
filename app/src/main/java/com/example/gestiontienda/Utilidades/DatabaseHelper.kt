@@ -9,6 +9,7 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import com.example.gestiontienda.Entidades.Cliente
 import com.example.gestiontienda.Entidades.Producto
 import com.example.gestiontienda.Entidades.Proveedor
 import com.example.gestiontienda.Entidades.Tienda
@@ -109,10 +110,12 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         db!!.execSQL(CREAR_PRODUCTO)
 
         // CREAR UN PROVEEDOR MODELO
-        for (n in 0..10) {
-            val CREAR_PROVEEDOR = "INSERT INTO PROVEEDORES VALUES('1' , 'PROVEEDOR$n' , '-' , '0' , '0' , '0' , '0', '0', '0', '0', '0')"
-            db!!.execSQL(CREAR_PROVEEDOR)
-        }
+        val CREAR_PROVEEDOR = "INSERT INTO PROVEEDORES VALUES('1' , 'PROVEEDOR' , '-' , '0' , '0' , '0' , '0', '0', '0', '0', '0')"
+        db!!.execSQL(CREAR_PROVEEDOR)
+
+        // CREAR UN Cliente MODELO
+        val CREAR_CLIENTE = "INSERT INTO CLIENTES VALUES('1' , 'CLIENTE TICKET' , '-' , '0' , '0' , '0' , '0', '0', '0', '0', '0')"
+        db!!.execSQL(CREAR_CLIENTE)
 
     }
 
@@ -319,6 +322,35 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
     fun borrarProducto(db: SQLiteDatabase, producto: Producto) {
         val DELETE_PRODUCTO = "DELETE FROM PRODUCTOS WHERE CODIGOPRODUCTO = '" + producto.codigoProducto + "'"
         db!!.execSQL(DELETE_PRODUCTO)
+    }
+
+    fun obtenerClientes(db: SQLiteDatabase): MutableList<Cliente> {
+        val listaclientesTMP = mutableListOf<Cliente>()
+        val datosBruto = db.rawQuery("SELECT * FROM CLIENTES", null)
+        if (datosBruto!!.moveToFirst()) {
+            do {
+                val idCliente = datosBruto.getString(datosBruto.getColumnIndex("IDCLIENTE"))
+                val nombreCliente = datosBruto.getString(datosBruto.getColumnIndex("NOMBRECLIENTE"))
+                val nombre2Cliente = datosBruto.getString(datosBruto.getColumnIndex("APELLIDOSCLIENTE"))
+                val direccionCliente = datosBruto.getString(datosBruto.getColumnIndex("DIRECCONCLIENTE"))
+                val ciudadCliente = datosBruto.getString(datosBruto.getColumnIndex("CIUDADCLIENTE"))
+                val provinciaCliente = datosBruto.getString(datosBruto.getColumnIndex("PROVINCIACLIENTE"))
+                val cpCliente = datosBruto.getString(datosBruto.getColumnIndex("CODIGOPOSTALCLIENTE"))
+                val telefonoCliente = datosBruto.getString(datosBruto.getColumnIndex("CIFCLIENTE"))
+                val cifCliente = datosBruto.getString(datosBruto.getColumnIndex("TELEFONOCLIENTE"))
+                val emailCliente = datosBruto.getString(datosBruto.getColumnIndex("EMAILCLIENTE"))
+                val referenciaCliente = datosBruto.getString(datosBruto.getColumnIndex("REFERENCIACLIENTE"))
+
+                var clienteTMP = Cliente(idCliente, nombreCliente,nombre2Cliente,direccionCliente,ciudadCliente,provinciaCliente,cpCliente.toInt(),telefonoCliente,cifCliente,emailCliente,referenciaCliente)
+                listaclientesTMP.add(clienteTMP)
+            } while (datosBruto.moveToNext())
+        }
+        datosBruto.close()
+        return listaclientesTMP
+    }
+
+    fun venderProductos(db: SQLiteDatabase, listaProductosVenta: MutableList<Producto>, cliente: Cliente) {
+        // TODO guardar venta en BD
     }
 
 
