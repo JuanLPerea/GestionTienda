@@ -89,7 +89,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
     override fun onCreate(db: SQLiteDatabase?) {
         Log.d("Miapp", "Crear BD")
         val CREATE_TABLE_TIENDA = "CREATE TABLE TIENDA (NOMBRETIENDA TEXT, DIRECCION TEXT, TELEFONO TEXT, EMAIL TEXT, CIF TEXT, OTROSDATOS TEXT)"
-        val CREATE_TABLE_PRODUCTOS = "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK INTEGER, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER)"
+        val CREATE_TABLE_PRODUCTOS = "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK INTEGER, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER, MARGENPRODUCTO TEXT)"
         val CREATE_TABLE_CLIENTES = "CREATE TABLE CLIENTES (IDCLIENTE ID, NOMBRECLIENTE TEXT, APELLIDOSCLIENTE TEXT, DIRECCONCLIENTE TEXT, CIUDADCLIENTE TEXT, PROVINCIACLIENTE TEXT, CODIGOPOSTALCLIENTE TEXT, CIFCLIENTE TEXT, TELEFONOCLIENTE TEXT, EMAILCLIENTE TEXT, REFERENCIACLIENTE TEXT)"
         val CREATE_TABLE_SALIDAS = "CREATE TABLE SALIDAS (IDSALIDA ID, TIPOSALIDA TEXT, PRODUCTOID TEXT, UNIDADES INTEGER, IMPORTE FLOAT, PRECIOVENTA FLOAT, CARGO TEXT, IVA INTEGER)"
         val CREATE_TABLE_PROVEEDORES = "CREATE TABLE PROVEEDORES (IDPROVEEDOR ID, NOMBREPROVEEDOR TEXT, APELLIDOSPROVEEDOR TEXT, DIRECCIONPROVEEDOR TEXT, CIUDADPROVEEDOR TEXT, PROVINCIAPROVEEDOR TEXT, CODIGOPOSTALPROVEEDOR TEXT, CIFPROVEEDOR TEXT, TELEFONOPROVEDOR TEXT, EMAILPROVEEDOR TEXT, REFERENCIAPROVEEDOR TEXT)"
@@ -106,7 +106,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         db!!.execSQL(CREATE_TABLE_BANCO)
 
         // CREAR UN PRODUCTO MODELO
-        val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('PRODUCTO' , '0' , '-' , '0' , '0' , '0' , '0')"
+        val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('PRODUCTO' , '0' , '-' , '0' , '0' , '0' , '0', '0')"
         db!!.execSQL(CREAR_PRODUCTO)
 
         // CREAR UN PROVEEDOR MODELO
@@ -156,7 +156,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         if (productoExiste(db, producto.codigoProducto)) {
             actualizarProducto(db, producto)
         }  else {
-            val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('" + producto.nombreProducto + "' , '" + producto.codigoProducto + "' , '"  + producto.rutafotoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + producto.precioVentaProducto + "' , '" + producto.ivaProducto + "')"
+            val CREAR_PRODUCTO = "INSERT INTO PRODUCTOS VALUES('" + producto.nombreProducto + "' , '" + producto.codigoProducto + "' , '"  + producto.rutafotoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + producto.precioVentaProducto + "' , '" + producto.ivaProducto+ "' , '" + producto.margenProducto + "')"
             db!!.execSQL(CREAR_PRODUCTO)
         }
     }
@@ -172,7 +172,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
     }
 
     fun obtenerProducto (db: SQLiteDatabase, codigoProducto: String) : Producto {
-        var productoTMP = Producto("","","",0,0f,0f,0)
+        var productoTMP = Producto("","","",0,0f,0f,0, 0f)
         val datosBruto = db.rawQuery("SELECT * FROM PRODUCTOS WHERE CODIGOPRODUCTO ='" + codigoProducto + "'", null)
         if (datosBruto!!.moveToFirst()) {
             val nombreTMP = datosBruto.getString(datosBruto.getColumnIndex("NOMBREPRODUCTO"))
@@ -182,6 +182,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             val precioCompraTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOCOMPRAPRODUCTO"))
             val precioVentaTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOVENTAPRODUCTO"))
             val ivaTMP = datosBruto.getInt(datosBruto.getColumnIndex("IVAPRODUCTO"))
+            val margenTMP = datosBruto.getString(datosBruto.getColumnIndex("MARGENPRODUCTO"))
             productoTMP.nombreProducto = nombreTMP
             productoTMP.codigoProducto = codigoTMP
             productoTMP.rutafotoProducto = rutafotoTMP
@@ -189,6 +190,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             productoTMP.precioCompraProducto = precioCompraTMP.toFloat()
             productoTMP.precioVentaProducto = precioVentaTMP.toFloat()
             productoTMP.ivaProducto = ivaTMP
+            productoTMP.margenProducto = margenTMP.toFloat()
         }
         return productoTMP
     }
@@ -232,8 +234,9 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
                 val precioCompraTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOCOMPRAPRODUCTO"))
                 val precioVentaTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOVENTAPRODUCTO"))
                 val ivaTMP = datosBruto.getInt(datosBruto.getColumnIndex("IVAPRODUCTO"))
+                val margenTMP = datosBruto.getString(datosBruto.getColumnIndex("MARGENPRODUCTO"))
 
-                val productoTMP = Producto("","","",0,0f,0f, 0)
+                val productoTMP = Producto("","","",0,0f,0f, 0, 0f)
                 productoTMP.nombreProducto = nombreTMP
                 productoTMP.codigoProducto = codigoTMP
                 productoTMP.rutafotoProducto = rutafotoTMP
@@ -241,6 +244,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
                 productoTMP.precioCompraProducto = precioCompraTMP.toFloat()
                 productoTMP.precioVentaProducto = precioVentaTMP.toFloat()
                 productoTMP.ivaProducto = ivaTMP
+                productoTMP.margenProducto = margenTMP.toFloat()
 
                 // Filtrar ...........................
                 //
@@ -266,7 +270,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         datosBruto.close()
 
         if (misProductos.size == 0) {
-            misProductos.add(Producto("No se encuentra Producto", "","",0,00f,0f,0))
+            misProductos.add(Producto("No se encuentra Producto", "","",0,00f,0f,0, 0f))
         }
 
         return misProductos
@@ -290,7 +294,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
 
     fun actualizarProducto(db: SQLiteDatabase, producto: Producto) {
         // "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK INTEGER, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER)"
-        val ACTUALIZAR_PRODUCTO = "UPDATE PRODUCTOS SET NOMBREPRODUCTO = '" + producto.nombreProducto + "' , CODIGOPRODUCTO = '" + producto.codigoProducto + "' , RUTAFOTOPRODUCTO = '" + producto.rutafotoProducto + "' , STOCK = '" + producto.stockProducto  + "' , PRECIOCOMPRAPRODUCTO = '" + producto.precioCompraProducto + "' , PRECIOVENTAPRODUCTO = '" + producto.precioVentaProducto + "' , IVAPRODUCTO = '" + producto.ivaProducto  + "' WHERE CODIGOPRODUCTO = '" + producto.codigoProducto + "'"
+        val ACTUALIZAR_PRODUCTO = "UPDATE PRODUCTOS SET NOMBREPRODUCTO = '" + producto.nombreProducto + "' , CODIGOPRODUCTO = '" + producto.codigoProducto + "' , RUTAFOTOPRODUCTO = '" + producto.rutafotoProducto + "' , STOCK = '" + producto.stockProducto  + "' , PRECIOCOMPRAPRODUCTO = '" + producto.precioCompraProducto + "' , PRECIOVENTAPRODUCTO = '" + producto.precioVentaProducto + "' , IVAPRODUCTO = '" + producto.ivaProducto + "' , MARGENPRODUCTO = '" + producto.margenProducto  + "' WHERE CODIGOPRODUCTO = '" + producto.codigoProducto + "'"
         db!!.execSQL(ACTUALIZAR_PRODUCTO)
     }
 
@@ -349,8 +353,17 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         return listaclientesTMP
     }
 
-    fun venderProductos(db: SQLiteDatabase, listaProductosVenta: MutableList<Producto>, cliente: Cliente) {
-        // TODO guardar venta en BD
+    fun venderProductos(db: SQLiteDatabase, listaProductosVenta: MutableList<Producto>, cliente: Cliente, modopago : Boolean) {
+       // Actualizar cada producto sumando al stock las unidades que entran y el precio de compra al último
+        listaProductosVenta.forEach { producto ->
+            val stockFinal =  obtenerProducto(db,producto.codigoProducto).stockProducto - producto.stockProducto
+            val UPDATE_PRODUCTO = "UPDATE PRODUCTOS SET STOCK = '" + stockFinal + "' , PRECIOVENTAPRODUCTO = '" + producto.precioVentaProducto + "' WHERE CODIGOPRODUCTO = '" + producto.codigoProducto + "'"
+            db!!.execSQL(UPDATE_PRODUCTO)
+        }
+
+
+        // TODO Añadir a la tabla de entradas los movimientos
+
     }
 
 

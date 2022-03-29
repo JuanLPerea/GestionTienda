@@ -95,6 +95,26 @@
                     android:text="💰"
                     android:textColor="@color/black"
                     android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/campo4_tabla"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:gravity="center_horizontal"
+                    android:text="💰"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/campo5_tabla"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.5"
+                    android:gravity="center_horizontal"
+                    android:text="💰"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
             </TableRow>
 
         </TableLayout>
@@ -131,16 +151,27 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/importeTotalProductos"
+            android:id="@+id/importeTotalIVA"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:background="@color/crema"
             android:gravity="bottom|center_horizontal"
             android:paddingRight="20dp"
-            android:text="Total"
             android:textColor="@color/black"
             android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/importeTotalPagar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/crema"
+            android:gravity="bottom|center_horizontal"
+            android:paddingRight="20dp"
+            android:textColor="@color/black"
+            android:textSize="20sp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -162,13 +193,13 @@
             android:textSize="14sp" />
 
         <Button
-            android:id="@+id/boton_dar_entrada"
+            android:id="@+id/boton_resumen_1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_margin="5dp"
-            android:layout_weight="1"
+            android:layout_weight="2"
             android:padding="2dp"
-            android:text="DAR ENTRADA"
+            android:text="RESUMEN_1"
             android:textSize="14sp" />
 
         <Button

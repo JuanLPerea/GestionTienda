@@ -8,9 +8,10 @@ package com.example.gestiontienda.Entidades
                    PRECIO_COMPRA
                    PRECIO_VENTA
                    IVA
+                   MARGEN DE BENEFICIO DEL PRODUCTO
 
  */
-class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProducto : String, stockProducto : Int, precioCompraProducto : Float, precioVentaProducto : Float, ivaProducto : Int) {
+class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProducto : String, stockProducto : Int, precioCompraProducto : Float, precioVentaProducto : Float, ivaProducto : Int , margenProducto : Float) {
 
     var nombreProducto : String
     var codigoProducto : String
@@ -19,6 +20,7 @@ class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProd
     var precioCompraProducto : Float
     var precioVentaProducto : Float
     var ivaProducto : Int
+    var margenProducto : Float
 
     init {
         this.nombreProducto = nombreProducto
@@ -28,6 +30,7 @@ class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProd
         this.precioCompraProducto = precioCompraProducto
         this.precioVentaProducto = precioVentaProducto
         this.ivaProducto = ivaProducto
+        this.margenProducto = margenProducto
     }
 
 }

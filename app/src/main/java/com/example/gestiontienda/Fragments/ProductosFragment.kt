@@ -218,7 +218,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         botonEntrada.setOnClickListener {
             carpeta = false
             if (productoSeleccionado.codigoProducto != "0") {
-                val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().toInt() , precioCompraProductoSeleccionado.text.toString().toFloat(), productoSeleccionado.precioVentaProducto, productoSeleccionado.ivaProducto )
+                val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().toInt() , precioCompraProductoSeleccionado.text.toString().toFloat(), productoSeleccionado.precioVentaProducto, productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
                 listaProductosEntrada.add(productoTmp)
                 carpeta = false
                 hideKeyboard()
@@ -290,11 +290,14 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
         val campo2 = dialog.findViewById(R.id.campo2_tabla) as TextView
         val campo3 = dialog.findViewById(R.id.campo3_tabla) as TextView
+        val campo4 = dialog.findViewById(R.id.campo4_tabla) as TextView
+        val campo5 = dialog.findViewById(R.id.campo5_tabla) as TextView
         val botonBorrarEntrada = dialog.findViewById(R.id.boton_borrar_todo_entrada) as Button
-        val botonDarEntrada = dialog.findViewById(R.id.boton_dar_entrada) as Button
+        val botonDarEntrada = dialog.findViewById(R.id.boton_resumen_1) as Button
+        botonDarEntrada.setText("DAR ENTRADA")
         val botonVolverEntrada = dialog.findViewById(R.id.boton_volver_entrada) as Button
         val totalProductos = dialog.findViewById(R.id.total_productos) as TextView
-        val importeTotal = dialog.findViewById(R.id.importeTotalProductos) as TextView
+        val importeTotal = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val seleccionarProveedorIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
         val proveedorSeleccionado = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
         proveedorSeleccionado.setText(proveedor.nombreProveedor)
@@ -302,9 +305,13 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams
         var campo3params = campo3.layoutParams
+        var campo4params = campo4.layoutParams
+        var campo5params = campo5.layoutParams
 
         var totalproductos = 0
         var importe_total = 0f
+        var totaliva = 0f
+        var totalpagar = 0f
 
         for (productoTMP in listaProductosEntrada) {
             val newRow = TableRow(dialog.context)
@@ -329,12 +336,33 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             campo3.setPadding(10,10,20,10)
             campo3.setText(productoTMP.precioCompraProducto.toString())
 
+            // IVA
+            val campo4 = TextView(dialog.context)
+            campo4.layoutParams = campo4params
+            campo4.setTextColor(resources.getColor(R.color.black))
+            campo4.gravity = Gravity.RIGHT
+            campo4.setPadding(10,10,20,10)
+            val iva = ((productoTMP.ivaProducto * productoTMP.precioCompraProducto) / 100)
+            totaliva += iva
+            campo4.setText(String.format("%.2f", iva).replace('.',','))
+            // SUBTOTAL
+            val campo5 = TextView(dialog.context)
+            campo5.layoutParams = campo5params
+            campo5.setTextColor(resources.getColor(R.color.black))
+            campo5.gravity = Gravity.RIGHT
+            campo5.setPadding(10,10,20,10)
+            val subtotal = productoTMP.precioCompraProducto + iva
+            totalpagar += subtotal
+            campo5.setText(String.format("%.2f", subtotal).replace('.',','))
+
             newRow.addView(campo1)
             newRow.addView(campo2)
             newRow.addView(campo3)
+            newRow.addView(campo4)
+            newRow.addView(campo5)
 
             totalproductos += productoTMP.stockProducto
-            importe_total += productoTMP.precioCompraProducto
+            importe_total += (productoTMP.precioCompraProducto * productoTMP.stockProducto)
             tablaEntrada.addView(newRow)
         }
         
@@ -434,11 +462,13 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val precioCompra = dialog.findViewById(R.id.precioCompraET) as EditText
         val precioVenta = dialog.findViewById(R.id.precioVentaET) as EditText
         val ivaProducto = dialog.findViewById(R.id.ivaET) as EditText
+        val margenProducto = dialog.findViewById(R.id.margenET) as EditText
 
         val botonGuardar = dialog.findViewById(R.id.boton_guardar_producto) as Button
         val botonFoto = dialog.findViewById(R.id.fotoProductoIB) as ImageButton
         val botonCancelar = dialog.findViewById(R.id.boton_cancelar_producto) as Button
         val imagenProducto = dialog.findViewById(R.id.productoNuevoIV) as ImageView
+        var stockProducto = 0
 
         tituloDialogoProducto.setText("Nuevo Producto")
         if (!nuevo) {
@@ -449,10 +479,47 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             precioCompra.setText(productoTMP.precioCompraProducto.toString())
             precioVenta.setText(productoTMP.precioVentaProducto.toString())
             ivaProducto.setText(productoTMP.ivaProducto.toString())
+            margenProducto.setText(productoTMP.margenProducto.toString().replace('.',','))
             bitmapFoto = ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoTMP.rutafotoProducto) as Bitmap
             imagenProducto.setImageBitmap(bitmapFoto)
             rutaImagenNuevoProducto = productoTMP.rutafotoProducto
+            stockProducto = productoTMP.stockProducto
         }
+
+        margenProducto.setOnFocusChangeListener { view, b ->
+
+            if (precioCompra.text.toString() != "" && ivaProducto.text.toString() != "" && margenProducto.text.toString() != "" && !b) {
+                val precio_compra = precioCompra.text.toString().replace(',','.').toFloat()
+                val iva = precio_compra * ivaProducto.text.toString().replace(',','.').toInt() / 100
+                val margen = precio_compra * margenProducto.text.toString().replace(',','.').toFloat() / 100
+                val precio_venta = precio_compra + iva + margen
+                precioVenta.setText(precio_venta.toString().format("%.2f", iva).replace('.',','))
+
+            }
+        }
+
+        ivaProducto.setOnFocusChangeListener {view, b ->
+            if (precioCompra.text.toString() != "" && ivaProducto.text.toString() != "" && margenProducto.text.toString() != "" && !b) {
+                if (precioCompra.text.toString() != "" && ivaProducto.text.toString() != "" && margenProducto.text.toString() != "") {
+                    val precio_compra = precioCompra.text.toString().replace(',','.').toFloat()
+                    val iva = precio_compra * ivaProducto.text.toString().replace(',','.').toInt() / 100
+                    val margen = precio_compra * margenProducto.text.toString().replace(',','.').toFloat() / 100
+                    val precio_venta = precio_compra + iva + margen
+                    precioVenta.setText(precio_venta.toString().format("%.2f", iva).replace('.',','))
+                }
+            }
+
+        precioVenta.setOnFocusChangeListener {view, b ->
+            if (precioCompra.text.toString() != ""&& precioVenta.text.toString() != "" && ivaProducto.text.toString() != "" && margenProducto.text.toString() != "" && !b) {
+                val precio_compra = precioCompra.text.toString().replace(',','.').toFloat()
+                val precio_venta = precioVenta.text.toString().replace(',','.').toFloat()
+                val iva = precio_compra * ivaProducto.text.toString().replace(',','.').toFloat() / 100
+                val margen = ((((precio_venta - iva) * 100) / precio_compra)-100).toString().format("%.2f", iva).replace('.', ',')
+                margenProducto.setText(margen.format("%.2f", iva).replace('.',','))
+
+            }
+       }
+    }
 
         botonGuardar.setOnClickListener {
             if (nombreProducto.text.toString() == "" || codigoProducto.text.toString() == "" || precioCompra.text.toString() == "" || precioVenta.text.toString() == "" || ivaProducto.text.toString() == "") {
@@ -461,9 +528,10 @@ class ProductosFragment : Fragment(), OnItemListClicked {
                 if (databaseHelper.productoExiste(db, codigoProducto.text.toString()) && nuevo) {
                     Toast.makeText(v.context, "Ya existe un producto con este código", Toast.LENGTH_LONG).show()
                 } else {
-                    val precioCompraTmp = precioCompra.text.toString().toFloat()
-                    val precioVentaTmp =precioVenta.text.toString().toFloat()
-                    val ivaTmp = ivaProducto.text.toString().toInt()
+                    val precioCompraTmp = precioCompra.text.toString().replace(',','.').toFloat()
+                    val precioVentaTmp =precioVenta.text.toString().replace(',','.').toFloat()
+                    val ivaTmp = ivaProducto.text.toString().replace(',','.').toInt()
+                    val margenTmp = margenProducto.text.toString().replace(',','.').toFloat()
 
                     if (nuevo) {
                         // Guardar imagen con el codigo de producto
@@ -474,7 +542,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
                         rutaImagenNuevoProducto = rutaImagen.toString()
                     }
 
-                    val miProducto = Producto(nombreProducto.text.toString(), codigoProducto.text.toString(), rutaImagenNuevoProducto,0, precioCompraTmp, precioVentaTmp, ivaTmp)
+                    val miProducto = Producto(nombreProducto.text.toString(), codigoProducto.text.toString(), rutaImagenNuevoProducto,stockProducto, precioCompraTmp, precioVentaTmp, ivaTmp, margenTmp)
                     databaseHelper.crearProducto(db, miProducto)
                     if (nuevo) {
                         Toast.makeText(v.context, "Nuevo producto creado", Toast.LENGTH_LONG).show()

@@ -15,7 +15,7 @@
             android:id="@+id/imagen_producto_fila"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
+            android:layout_weight="1.3"
             android:padding="5dp"
             android:scaleType="centerCrop"
             android:src="@drawable/nophoto" />
@@ -41,7 +41,6 @@
                 android:id="@+id/codigoProductoTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
                 android:text="Codigo Producto"
                 android:textColor="@color/black" />
 
