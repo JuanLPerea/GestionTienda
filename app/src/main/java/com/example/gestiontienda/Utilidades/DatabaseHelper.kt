@@ -337,6 +337,10 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
                 }
                 if (filtrarAdd) listaProveedores.add(proveedorTMP)
 
+                if (listaProveedores.size == 0) {
+                    listaProveedores.add(Proveedor("No se encuentra Proveedor", "","","","","",0, "", "", "", ""))
+                }
+
             } while (datosBruto.moveToNext())
         }
         datosBruto.close()
@@ -440,31 +444,36 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         val DELETE_CLIENTE = "DELETE FROM CLIENTES WHERE IDCLIENTE = '" + cliente.idCliente + "'"
         db!!.execSQL(DELETE_CLIENTE)
     }
-/*
-    fun obtenerCliente (db: SQLiteDatabase, codigoCliente: String) : Cliente {
-        var productoTMP = Cliente("","","",0,0f,0f,0, 0f)
-        val datosBruto = db.rawQuery("SELECT * FROM PRODUCTOS WHERE CODIGOPRODUCTO ='" + codigoProducto + "'", null)
-        if (datosBruto!!.moveToFirst()) {
-            val nombreTMP = datosBruto.getString(datosBruto.getColumnIndex("NOMBREPRODUCTO"))
-            val codigoTMP = datosBruto.getString(datosBruto.getColumnIndex("CODIGOPRODUCTO"))
-            val rutafotoTMP = datosBruto.getString(datosBruto.getColumnIndex("RUTAFOTOPRODUCTO"))
-            val stockProductoTMP = datosBruto.getInt(datosBruto.getColumnIndex("STOCK"))
-            val precioCompraTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOCOMPRAPRODUCTO"))
-            val precioVentaTMP = datosBruto.getString(datosBruto.getColumnIndex("PRECIOVENTAPRODUCTO"))
-            val ivaTMP = datosBruto.getInt(datosBruto.getColumnIndex("IVAPRODUCTO"))
-            val margenTMP = datosBruto.getString(datosBruto.getColumnIndex("MARGENPRODUCTO"))
-            productoTMP.nombreProducto = nombreTMP
-            productoTMP.codigoProducto = codigoTMP
-            productoTMP.rutafotoProducto = rutafotoTMP
-            productoTMP.stockProducto = stockProductoTMP.toInt()
-            productoTMP.precioCompraProducto = precioCompraTMP.toFloat()
-            productoTMP.precioVentaProducto = precioVentaTMP.toFloat()
-            productoTMP.ivaProducto = ivaTMP
-            productoTMP.margenProducto = margenTMP.toFloat()
+
+    fun guardarProveedor(db: SQLiteDatabase, proveedor: Proveedor) {
+        if (proveedorExiste(db, proveedor.idProveedor)) {
+            actualizarProveedor(db, proveedor)
+        }  else {
+            // val CREATE_TABLE_CLIENTES = "CREATE TABLE CLIENTES (IDCLIENTE ID, NOMBRECLIENTE TEXT, APELLIDOSCLIENTE TEXT, DIRECCIONCLIENTE TEXT, CIUDADCLIENTE TEXT, PROVINCIACLIENTE TEXT, CODIGOPOSTALCLIENTE TEXT, CIFCLIENTE TEXT, TELEFONOCLIENTE TEXT, EMAILCLIENTE TEXT, REFERENCIACLIENTE TEXT)"
+            val CREAR_PROVEEDOR = "INSERT INTO PROVEEDORES VALUES('" + proveedor.idProveedor + "' , '" + proveedor.nombreProveedor + "' , '"  + proveedor.nombre2Proveedor + "' , '" + proveedor.direccionProveedor + "' , '" + proveedor.ciudadProveedor + "' , '" + proveedor.provinciaProveedor + "' , '" + proveedor.cpProveedor + "' , '" + proveedor.cifProveedor + "' , '"  + proveedor.telefonoProveedor + "' , '"  + proveedor.emailProveedor + "' , '" + proveedor.referenciaProveedor  + "')"
+            db!!.execSQL(CREAR_PROVEEDOR)
         }
-        return productoTMP
     }
 
-*/
+    fun proveedorExiste (db: SQLiteDatabase, codigoProveedor : String) : Boolean {
+        var existe = false
+        val datosBruto = db.rawQuery("SELECT * FROM PROVEEDORES WHERE IDPROVEEDOR ='" + codigoProveedor + "'", null)
+        if (datosBruto!!.moveToFirst()) {
+            Log.d("Miapp" , "El proveedor ya existe")
+            existe = true
+        }
+        return existe
+    }
+
+    fun actualizarProveedor(db: SQLiteDatabase, proveedor: Proveedor) {
+        val ACTUALIZAR_PROVEEDOR = "UPDATE PROVEEDORES SET IDPROVEEDOR = '" + proveedor.idProveedor + "' , NOMBREPROVEEDOR = '" + proveedor.nombreProveedor + "' , APELLIDOSPROVEEDOR = '" + proveedor.nombre2Proveedor + "' , DIRECCIONPROVEEDOR = '" + proveedor.direccionProveedor  + "' , CIUDADPROVEEDOR = '" + proveedor.ciudadProveedor + "' , PROVINCIAPROVEEDOR = '" + proveedor.provinciaProveedor + "' , CODIGOPOSTALPROVEEDOR = '" + proveedor.cpProveedor + "' , CIFPROVEEDOR = '" + proveedor.cifProveedor + "' , TELEFONOPROVEEDOR = '" + proveedor.telefonoProveedor + "' , EMAILPROVEEDOR = '" + proveedor.emailProveedor + "' , REFERENCIAPROVEEDOR = '" + proveedor.referenciaProveedor+ "' WHERE IDPROVEEDOR = '" + proveedor.idProveedor + "'"
+        db!!.execSQL(ACTUALIZAR_PROVEEDOR)
+    }
+
+    fun borrarProveedor(db: SQLiteDatabase, proveedor: Proveedor) {
+        val DELETE_PROVEEDOR = "DELETE FROM PROVEEDORES WHERE IDPROVEEDOR = '" + proveedor.idProveedor + "'"
+        db!!.execSQL(DELETE_PROVEEDOR)
+    }
+
 
 }

@@ -29,8 +29,6 @@ private lateinit var botonAdd : FloatingActionButton
 lateinit var mRecyclerView: RecyclerView
 private lateinit var databaseHelper: DatabaseHelper
 private lateinit var db: SQLiteDatabase
-private lateinit var rutaImagenNuevoProducto : String
-private lateinit var vistaFragment : Dialog
 private lateinit var bitmapFoto : Bitmap
 private lateinit var buscarNombre : EditText
 private lateinit var buscarCodigo : EditText

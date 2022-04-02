@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/titulo_dialogo_proveedor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="Nuevo Proveedor"
+                    android:textSize="24sp" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Código del proveedor:" />
+
+                <TextView
+                    android:id="@+id/codigoProveedorTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:text="0" />
+
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre del Proveedor:" />
+
+                <EditText
+                    android:id="@+id/nombreProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Nombre Proveedor"
+                    android:inputType="text" />
+
+
+                <TextView
+                    android:id="@+id/textView7"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Nombre Proveedor 2" />
+
+                <EditText
+                    android:id="@+id/apellidosProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Nombre proveedor 2"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/textView37"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Dirección Proveedor" />
+
+                <EditText
+                    android:id="@+id/direccionProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Dirección Proveedor"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/textView337"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Ciudad" />
+
+                <EditText
+                    android:id="@+id/ciudadProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Ciudad"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/textView33347"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Provincia Proveedor" />
+
+                <EditText
+                    android:id="@+id/provinciaProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Provincia"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/textView237"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Código Postal" />
+
+                <EditText
+                    android:id="@+id/cpProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Código postal"
+                    android:inputType="numberDecimal"
+                    android:maxLength="5" />
+
+                <TextView
+                    android:id="@+id/textView23747"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Teléfono Proveedor" />
+
+                <EditText
+                    android:id="@+id/telefonoProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Teléfono"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:id="@+id/textView237347"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="DNI / CIF" />
+
+                <EditText
+                    android:id="@+id/CIFProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="DNI/CIF"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:id="@+id/textView2337347"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="e-mail" />
+
+                <EditText
+                    android:id="@+id/emailProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="e-mail"
+                    android:inputType="text" />
+
+                <TextView
+                    android:id="@+id/textView23337347"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Referencia / Otros datos" />
+
+                <EditText
+                    android:id="@+id/referenciaProveedorET"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="Referencia / Otros Datos"
+                    android:inputType="text" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/boton_guardar_proveedor"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            android:gravity="center"
+                            android:text="GUARDAR" />
+
+                        <Button
+                            android:id="@+id/boton_cancelar_proveedor"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_margin="10dp"
+                            android:layout_weight="1"
+                            android:text="CANCELAR" />
+                </LinearLayout>
+
+                <Space
+                    android:layout_width="400dp"
+                    android:layout_height="wrap_content" />
+
+                />
+
+
+        </LinearLayout>
+
+
+</ScrollView>

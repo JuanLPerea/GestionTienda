@@ -165,7 +165,6 @@ class ClientesFragment : Fragment() , OnClienteListClicked {
         val itemTouchHelper = ItemTouchHelper(simpleItemTouchCallback)
         itemTouchHelper.attachToRecyclerView(mRecyclerView)
 
-
         return v
     }
 

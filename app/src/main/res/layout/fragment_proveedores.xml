@@ -72,13 +72,26 @@
                 android:layout_weight="1"
                 android:src="@drawable/nophoto" />
 
-            <TextView
-                android:id="@+id/nombreProveedorSeleccionado"
+            <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:padding="10dp"
-                android:text="Nombre de Proveedor" />
+                android:layout_weight="5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/nombreProveedorSeleccionado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Nombre de Proveedor" />
+
+                <TextView
+                    android:id="@+id/codigoProveedorSeleccionado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="10dp"
+                    android:text="Código del Proveedor" />
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -87,7 +100,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:background="@drawable/carpeta1"
+            android:background="@drawable/carpeta3"
             android:gravity="center_vertical"
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
