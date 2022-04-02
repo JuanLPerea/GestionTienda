@@ -27,7 +27,7 @@
             android:text="Buscar:" />
 
         <EditText
-            android:id="@+id/buscarCodigoProducto"
+            android:id="@+id/buscarCodigoCliente"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="10dp"
@@ -43,7 +43,7 @@
 
 
         <EditText
-            android:id="@+id/buscarNombreProducto"
+            android:id="@+id/buscarNombreCliente"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_margin="10dp"
@@ -74,7 +74,7 @@
                 app:srcCompat="@android:drawable/sym_def_app_icon" />
 
             <TextView
-                android:id="@+id/nombreProductoSeleccionado"
+                android:id="@+id/nombreClienteSeleccionado"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
@@ -164,14 +164,14 @@
             app:autoSizeTextType="uniform" />
 
         <FrameLayout
-            android:id="@+id/frameProductos"
+            android:id="@+id/frameClientes"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="15"
             android:background="@color/crema">
 
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_productosRV"
+                android:id="@+id/recycler_clientesRV"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 

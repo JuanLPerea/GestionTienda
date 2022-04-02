@@ -12,7 +12,7 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/imagen_producto_fila"
+            android:id="@+id/imagen_fila"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1.3"
@@ -27,7 +27,7 @@
             android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/nombreproducto_fila"
+                    android:id="@+id/nombre_cliente_proveedor_fila"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -38,7 +38,7 @@
                     android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/codigoProductoTV"
+                android:id="@+id/codigo_cliente_proveedorTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Codigo Producto"

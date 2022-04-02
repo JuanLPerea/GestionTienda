@@ -135,7 +135,7 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/boton_guardar_producto"
+            android:id="@+id/boton_guardar_cliente"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -145,7 +145,7 @@
             android:text="Guardar" />
 
         <Button
-            android:id="@+id/boton_cancelar_producto"
+            android:id="@+id/boton_cancelar_cliente"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

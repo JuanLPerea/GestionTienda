@@ -58,11 +58,11 @@ class VentasFragment : Fragment(), OnItemListClicked {
 
         // Views
         imagenProductoSeleccionado = v.findViewById(R.id.imagenProductoSeleccionado) as ImageView
-        nombreProductoSeleccionado = v.findViewById(R.id.nombreProductoSeleccionado) as TextView
+        nombreProductoSeleccionado = v.findViewById(R.id.nombreClienteSeleccionado) as TextView
         stockProductoSeleccionado = v.findViewById(R.id.StockProductoSeleccionado) as TextView
         precioVentaProductoSeleccionado = v.findViewById(R.id.PrecioCompraProductoSeleccionado) as EditText
         carpetaTV = v.findViewById(R.id.carpetaTV) as TextView
-        frameProductos = v.findViewById(R.id.frameProductos) as FrameLayout
+        frameProductos = v.findViewById(R.id.frameClientes) as FrameLayout
         floatingVentaButton = v.findViewById(R.id.floatingActionButtonEntrada) as FloatingActionButton
         floatingVentaButton.visibility = View.VISIBLE
         botonMas = v.findViewById(R.id.botonMas) as Button
@@ -97,7 +97,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
         productoSeleccionado = listaProductos.first()
 
 
-        mRecyclerView = v.findViewById(R.id.recycler_productosRV) as RecyclerView
+        mRecyclerView = v.findViewById(R.id.recycler_clientesRV) as RecyclerView
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.layoutManager = LinearLayoutManager(v.context)
 
@@ -121,7 +121,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
 
 
         // Buscar por nombre producto
-        buscarNombre = v.findViewById(R.id.buscarNombreProducto) as EditText
+        buscarNombre = v.findViewById(R.id.buscarNombreCliente) as EditText
         buscarNombre.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -137,7 +137,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
 
         })
 
-        buscarCodigo = v.findViewById(R.id.buscarCodigoProducto) as EditText
+        buscarCodigo = v.findViewById(R.id.buscarCodigoCliente) as EditText
         buscarCodigo.addTextChangedListener(object  : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -187,7 +187,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.entrada_productos)
 
-        var cliente = databaseHelper.obtenerClientes(db).first()
+        var cliente = databaseHelper.obtenerClientes(db,"","").first()
         val encabezadoDialogoProductos = dialog.findViewById(R.id.encabezadoResumenProductos) as TextView
         val tablaEntrada = dialog.findViewById(R.id.tablaProductos) as TableLayout
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
@@ -306,11 +306,13 @@ class VentasFragment : Fragment(), OnItemListClicked {
             botonVentaTicket.setOnClickListener {
                 finalizarVenta(cliente, togglePago.isChecked)
                 dialogPago.dismiss()
+                dialog.dismiss()
             }
 
             botonVentaFactura.setOnClickListener {
                 finalizarVenta(cliente, togglePago.isChecked)
                 dialogPago.dismiss()
+                dialog.dismiss()
             }
             dialogPago.show()
         }
@@ -321,7 +323,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
             dialogSeleccionarCliente.setCancelable(false)
             dialogSeleccionarCliente.setContentView(R.layout.dialogo_seleccionar)
 
-            val listaClientes = databaseHelper.obtenerClientes(db)
+            val listaClientes = databaseHelper.obtenerClientes(db, "", "")
             val picker = dialogSeleccionarCliente.findViewById(R.id.tablaSeleccion) as TableLayout
 
             listaClientes.forEach { clienteTMP ->

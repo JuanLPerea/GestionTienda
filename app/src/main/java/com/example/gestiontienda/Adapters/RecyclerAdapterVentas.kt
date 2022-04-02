@@ -43,13 +43,13 @@ class RecyclerAdapterVentas : RecyclerView.Adapter<RecyclerAdapterVentas.ViewHol
     }
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view)   {
-        val nombreProducto = view.findViewById(R.id.nombreproducto_fila) as TextView
+        val nombreProducto = view.findViewById(R.id.nombre_cliente_proveedor_fila) as TextView
         val precioCompraProducto = view.findViewById(R.id.preciocompra_fila) as TextView
         val precioVentaProducto = view.findViewById(R.id.precioventa_fila) as TextView
         val stockProducto = view.findViewById(R.id.stockproducto_fila) as TextView
         val ivaProducto = view.findViewById(R.id.ivaproducto_fila) as TextView
-        val imagenProducto = view.findViewById(R.id.imagen_producto_fila) as ImageView
-        val codigoProducto = view.findViewById(R.id.codigoProductoTV) as TextView
+        val imagenProducto = view.findViewById(R.id.imagen_fila) as ImageView
+        val codigoProducto = view.findViewById(R.id.codigo_cliente_proveedorTV) as TextView
         //  val linearBase = view.findViewById(R.id.linear_base_fila) as LinearLayout
 
 
@@ -57,8 +57,8 @@ class RecyclerAdapterVentas : RecyclerView.Adapter<RecyclerAdapterVentas.ViewHol
             val imagesHelper = ImagesHelper(context)
             nombreProducto.text = producto.nombreProducto
             precioCompraProducto.text = "📄"
-            precioVentaProducto.text = producto.precioVentaProducto.toString()
-            stockProducto.text = producto.stockProducto.toString()
+            precioVentaProducto.text = String.format("%.2f" , producto.precioVentaProducto).replace('.',',')
+            stockProducto.text =  producto.stockProducto.toString()
             ivaProducto.text = producto.ivaProducto.toString()
             codigoProducto.text = producto.codigoProducto.toString()
 

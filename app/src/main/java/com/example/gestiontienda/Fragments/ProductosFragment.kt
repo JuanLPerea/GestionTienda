@@ -68,11 +68,11 @@ class ProductosFragment : Fragment(), OnItemListClicked {
 
         // Views
         imagenProductoSeleccionado = v.findViewById(R.id.imagenProductoSeleccionado) as ImageView
-        nombreProductoSeleccionado = v.findViewById(R.id.nombreProductoSeleccionado) as TextView
+        nombreProductoSeleccionado = v.findViewById(R.id.nombreClienteSeleccionado) as TextView
         stockProductoSeleccionado = v.findViewById(R.id.StockProductoSeleccionado) as TextView
         precioCompraProductoSeleccionado = v.findViewById(R.id.PrecioCompraProductoSeleccionado) as EditText
         carpetaTV = v.findViewById(R.id.carpetaTV) as TextView
-        frameProductos = v.findViewById(R.id.frameProductos) as FrameLayout
+        frameProductos = v.findViewById(R.id.frameClientes) as FrameLayout
         floatingAddButton = v.findViewById(R.id.floatingActionButtonAdd) as FloatingActionButton
         floatingEntradaButton = v.findViewById(R.id.floatingActionButtonEntrada) as FloatingActionButton
         botonEntrada = v.findViewById(R.id.botonEntrada) as Button
@@ -104,7 +104,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         productoSeleccionado = listaProductos.first()
         actualizarProductoSeleccionado()
 
-        mRecyclerView = v.findViewById(R.id.recycler_productosRV) as RecyclerView
+        mRecyclerView = v.findViewById(R.id.recycler_clientesRV) as RecyclerView
         mRecyclerView.setHasFixedSize(true)
         mRecyclerView.layoutManager = LinearLayoutManager(v.context)
 
@@ -183,7 +183,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         itemTouchHelper.attachToRecyclerView(mRecyclerView)
 
         // Buscar por nombre producto
-        buscarNombre = v.findViewById(R.id.buscarNombreProducto) as EditText
+        buscarNombre = v.findViewById(R.id.buscarNombreCliente) as EditText
         buscarNombre.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable) {}
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -199,7 +199,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
 
         })
 
-        buscarCodigo = v.findViewById(R.id.buscarCodigoProducto) as EditText
+        buscarCodigo = v.findViewById(R.id.buscarCodigoCliente) as EditText
         buscarCodigo.addTextChangedListener(object  : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -264,9 +264,9 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         botonConfirmarOK.setOnClickListener {
             databaseHelper.borrarProducto(db, listaProductos.get(position))
             Toast.makeText(dialog.context, "Producto Borrado", Toast.LENGTH_LONG).show()
-            listaProductos = databaseHelper.obtenerProductos(db, "", "")
-            mAdapter.notifyDataSetChanged()
-            carpetaClick()
+            listaProductos.remove(listaProductos.get(position))
+            mAdapter.notifyItemRemoved(position)
+          //  carpetaClick()
             dialog.dismiss()
         }
 
@@ -284,7 +284,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         dialog.setCancelable(false)
         dialog.setContentView(R.layout.entrada_productos)
 
-        var proveedor = databaseHelper.obtenerProveedores(db).first()
+        var proveedor = databaseHelper.obtenerProveedores(db, "", "").first()
 
         val tablaEntrada = dialog.findViewById(R.id.tablaProductos) as TableLayout
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
@@ -395,7 +395,7 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             dialogSeleccionarProveedor.setCancelable(false)
             dialogSeleccionarProveedor.setContentView(R.layout.dialogo_seleccionar)
 
-            val listaProveedores = databaseHelper.obtenerProveedores(db)
+            val listaProveedores = databaseHelper.obtenerProveedores(db,"","")
             val picker = dialogSeleccionarProveedor.findViewById(R.id.tablaSeleccion) as TableLayout
 
             listaProveedores.forEach { proveedorTMP ->
@@ -464,10 +464,11 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val ivaProducto = dialog.findViewById(R.id.ivaET) as EditText
         val margenProducto = dialog.findViewById(R.id.margenET) as EditText
 
-        val botonGuardar = dialog.findViewById(R.id.boton_guardar_producto) as Button
+        val botonGuardar = dialog.findViewById(R.id.boton_guardar_cliente) as Button
         val botonFoto = dialog.findViewById(R.id.fotoProductoIB) as ImageButton
-        val botonCancelar = dialog.findViewById(R.id.boton_cancelar_producto) as Button
+        val botonCancelar = dialog.findViewById(R.id.boton_cancelar_cliente) as Button
         val imagenProducto = dialog.findViewById(R.id.productoNuevoIV) as ImageView
+        bitmapFoto = BitmapFactory.decodeResource(activity!!.resources, R.drawable.nophoto)
         var stockProducto = 0
 
         tituloDialogoProducto.setText("Nuevo Producto")
