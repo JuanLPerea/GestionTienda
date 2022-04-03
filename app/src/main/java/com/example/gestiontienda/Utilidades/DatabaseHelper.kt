@@ -325,7 +325,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
                     filtrarAdd = true
                 } else {
                     // si filtramos por nombre, añadir si contiene el texto buscado
-                    if (!nombreFiltrar.equals("") && proveedorTMP.nombreProveedor.uppercase().contains(nombreFiltrar.uppercase())) {
+                    if (!nombreFiltrar.equals("") && (proveedorTMP.nombreProveedor.uppercase().contains(nombreFiltrar.uppercase()) || proveedorTMP.nombre2Proveedor.uppercase().contains(nombreFiltrar.uppercase()))) {
                         filtrarAdd = true
                     } else {
                         // si filtramos por codigo producto, añadir si contiene el texto buscado

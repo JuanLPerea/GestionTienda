@@ -26,15 +26,18 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gestiontienda.Adapters.RecyclerAdapter
+import com.example.gestiontienda.Adapters.RecyclerAdapterProveedores
 import com.example.gestiontienda.Entidades.Producto
+import com.example.gestiontienda.Entidades.Proveedor
 import com.example.gestiontienda.Interfaces.OnItemListClicked
+import com.example.gestiontienda.Interfaces.OnProveedorListClicked
 import com.example.gestiontienda.R
 import com.example.gestiontienda.Utilidades.DatabaseHelper
 import com.example.gestiontienda.Utilidades.ImagesHelper
 import com.example.gestiontienda.Utilidades.Utilidades.Companion.hideKeyboard
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class ProductosFragment : Fragment(), OnItemListClicked {
+class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked {
 
     lateinit var mRecyclerView: RecyclerView
     private lateinit var databaseHelper: DatabaseHelper
@@ -62,6 +65,9 @@ class ProductosFragment : Fragment(), OnItemListClicked {
     var listaProductosEntrada : MutableList<Producto> = mutableListOf()
     private var carpeta = true
     private lateinit var miContexto : Context
+    private lateinit var dialogSeleccionarProveedor : Dialog
+    private lateinit var proveedorSeleccionado : Proveedor
+    private lateinit var proveedorSeleccionadoTV : TextView
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.fragment_productos, container, false)
@@ -299,8 +305,8 @@ class ProductosFragment : Fragment(), OnItemListClicked {
         val totalProductos = dialog.findViewById(R.id.total_productos) as TextView
         val importeTotal = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val seleccionarProveedorIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
-        val proveedorSeleccionado = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
-        proveedorSeleccionado.setText(proveedor.nombreProveedor)
+        proveedorSeleccionadoTV = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
+        proveedorSeleccionadoTV.setText(proveedor.nombreProveedor)
         
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams
@@ -389,27 +395,47 @@ class ProductosFragment : Fragment(), OnItemListClicked {
             dialog.dismiss()
         }
 
+        // Seleccionar proveedor
         seleccionarProveedorIB.setOnClickListener { vista ->
-            val dialogSeleccionarProveedor = Dialog(vista.context)
+            dialogSeleccionarProveedor = Dialog(vista.context)
             dialogSeleccionarProveedor.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialogSeleccionarProveedor.setCancelable(false)
             dialogSeleccionarProveedor.setContentView(R.layout.dialogo_seleccionar)
 
-            val listaProveedores = databaseHelper.obtenerProveedores(db,"","")
-            val picker = dialogSeleccionarProveedor.findViewById(R.id.tablaSeleccion) as TableLayout
+            val buscarNombreET = dialogSeleccionarProveedor.findViewById(R.id. buscar_por_nombre_dialogo_seleccionar) as EditText
+            val buscarCodigoET = dialogSeleccionarProveedor.findViewById(R.id. buscar_por_codigo_dialogo_seleccionar) as EditText
+            val tituloDialogoTV = dialogSeleccionarProveedor.findViewById(R.id.titulo_dialogo_seleccionar) as TextView
+            tituloDialogoTV.setText("Selecciona Proveedor")
 
-            listaProveedores.forEach { proveedorTMP ->
-                val nuevaFila = TableRow(vista.context)
-                val rowProveedor = TextView(vista.context)
-                rowProveedor.setText(proveedorTMP.nombreProveedor)
-                rowProveedor.setOnClickListener {
-                    proveedor = proveedorTMP
-                    proveedorSeleccionado.setText(proveedor.nombreProveedor)
-                    dialogSeleccionarProveedor.dismiss()
+            var listaProveedores = databaseHelper.obtenerProveedores(db, "", "")
+            val recyclerDialogoSeleccionar = dialogSeleccionarProveedor.findViewById(R.id.recycler_dialogo_seleccionar) as RecyclerView
+            recyclerDialogoSeleccionar.setHasFixedSize(true)
+            recyclerDialogoSeleccionar.layoutManager = LinearLayoutManager(dialogSeleccionarProveedor.context)
+
+            val adapterSeleccionar = RecyclerAdapterProveedores()
+            adapterSeleccionar.RecyclerAdapter(listaProveedores, miContexto, this)
+            recyclerDialogoSeleccionar.adapter = adapterSeleccionar
+
+            buscarNombreET.addTextChangedListener(object  : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    listaProveedores.clear()
+                    listaProveedores.addAll(databaseHelper.obtenerProveedores(db, buscarNombreET.text.toString(), ""))
+                    adapterSeleccionar.notifyDataSetChanged()
                 }
-                nuevaFila.addView(rowProveedor)
-                picker.addView(nuevaFila)
-            }
+            })
+
+            buscarCodigoET.addTextChangedListener(object  : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    listaProveedores.clear()
+                    listaProveedores.addAll(databaseHelper.obtenerProveedores(db, "", buscarCodigoET.text.toString()))
+                    adapterSeleccionar.notifyDataSetChanged()
+                }
+            })
+
             dialogSeleccionarProveedor.show()
         }
         dialog.show()
@@ -688,5 +714,12 @@ class ProductosFragment : Fragment(), OnItemListClicked {
     override fun onResume() {
         super.onResume()
         carpetaClick()
+    }
+
+    override fun itemListClicked(proveedor: Proveedor, itemView: View) {
+        // Seleccionar un proveedor
+        proveedorSeleccionadoTV.setText(proveedor.nombreProveedor + " " + proveedor.nombre2Proveedor)
+        proveedorSeleccionado = proveedor
+        dialogSeleccionarProveedor.dismiss()
     }
 }

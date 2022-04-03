@@ -8,14 +8,17 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gestiontienda.Adapters.RecyclerAdapterClientes
 import com.example.gestiontienda.Adapters.RecyclerAdapterVentas
 import com.example.gestiontienda.Entidades.Cliente
 import com.example.gestiontienda.Entidades.Producto
+import com.example.gestiontienda.Interfaces.OnClienteListClicked
 import com.example.gestiontienda.Interfaces.OnItemListClicked
 import com.example.gestiontienda.R
 import com.example.gestiontienda.Utilidades.DatabaseHelper
@@ -48,8 +51,11 @@ private lateinit var productoSeleccionado : Producto
 var listaProductosVenta : MutableList<Producto> = mutableListOf()
 private var carpeta = true
 private lateinit var miContexto : Context
+private lateinit var dialogSeleccionarCliente : Dialog
+private lateinit var clienteSeleccionado : Cliente
+private lateinit var clienteSeleccionadoTV : TextView
 
-class VentasFragment : Fragment(), OnItemListClicked {
+class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val v = inflater.inflate(R.layout.fragment_productos, container, false)
@@ -66,6 +72,7 @@ class VentasFragment : Fragment(), OnItemListClicked {
         botonMas = v.findViewById(R.id.botonMas) as Button
         botonMenos = v.findViewById(R.id.botonMenos) as Button
         cantidadET = v.findViewById(R.id.cantidadET) as EditText
+
         floatingVentaButton.visibility = View.INVISIBLE
 
         // Contexto
@@ -202,8 +209,8 @@ class VentasFragment : Fragment(), OnItemListClicked {
         val totalIVA = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val totalPagar = dialog.findViewById(R.id.importeTotalPagar) as TextView
         val seleccionarClienteIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
-        val clienteSeleccionado = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
-        clienteSeleccionado.setText(cliente.nombreCliente)
+        clienteSeleccionadoTV = dialog.findViewById(R.id.proveedorSeleccionado)
+        clienteSeleccionadoTV.setText(cliente.nombreCliente)
         encabezadoDialogoProductos.setText("Carrito de la Compra")
 
         var campo1params = campo1.layoutParams
@@ -315,27 +322,47 @@ class VentasFragment : Fragment(), OnItemListClicked {
             dialogPago.show()
         }
 
+        // Diálogo para seleccionar un cliente
         seleccionarClienteIB.setOnClickListener { vista ->
-            val dialogSeleccionarCliente = Dialog(vista.context)
+            dialogSeleccionarCliente = Dialog(vista.context)
             dialogSeleccionarCliente.requestWindowFeature(Window.FEATURE_NO_TITLE)
             dialogSeleccionarCliente.setCancelable(false)
             dialogSeleccionarCliente.setContentView(R.layout.dialogo_seleccionar)
 
-            val listaClientes = databaseHelper.obtenerClientes(db, "", "")
-            val picker = dialogSeleccionarCliente.findViewById(R.id.tablaSeleccion) as TableLayout
+            val buscarNombreET = dialogSeleccionarCliente.findViewById(R.id. buscar_por_nombre_dialogo_seleccionar) as EditText
+            val buscarCodigoET = dialogSeleccionarCliente.findViewById(R.id. buscar_por_codigo_dialogo_seleccionar) as EditText
+            val tituloDialogoTV = dialogSeleccionarCliente.findViewById(R.id.titulo_dialogo_seleccionar) as TextView
+            tituloDialogoTV.setText("Selecciona Cliente")
 
-            listaClientes.forEach { clienteTMP ->
-                val nuevaFila = TableRow(vista.context)
-                val rowProveedor = TextView(vista.context)
-                rowProveedor.setText(clienteTMP.nombreCliente)
-                rowProveedor.setOnClickListener {
-                    cliente = clienteTMP
-                    clienteSeleccionado.setText(cliente.nombreCliente)
-                    dialogSeleccionarCliente.dismiss()
+            var listaClientes = databaseHelper.obtenerClientes(db, "", "")
+            val recyclerDialogoSeleccionar = dialogSeleccionarCliente.findViewById(R.id.recycler_dialogo_seleccionar) as RecyclerView
+            recyclerDialogoSeleccionar.setHasFixedSize(true)
+            recyclerDialogoSeleccionar.layoutManager = LinearLayoutManager(dialogSeleccionarCliente.context)
+
+            val adapterSeleccionar = RecyclerAdapterClientes()
+            adapterSeleccionar.RecyclerAdapter(listaClientes, miContexto, this)
+            recyclerDialogoSeleccionar.adapter = adapterSeleccionar
+
+            buscarNombreET.addTextChangedListener(object  : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    listaClientes.clear()
+                    listaClientes.addAll(databaseHelper.obtenerClientes(db, buscarNombreET.text.toString(), ""))
+                    adapterSeleccionar.notifyDataSetChanged()
                 }
-                nuevaFila.addView(rowProveedor)
-                picker.addView(nuevaFila)
-            }
+            })
+
+            buscarCodigoET.addTextChangedListener(object  : TextWatcher {
+                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+                override fun afterTextChanged(s: Editable?) {
+                    listaClientes.clear()
+                    listaClientes.addAll(databaseHelper.obtenerClientes(db, "", buscarCodigoET.text.toString()))
+                    adapterSeleccionar.notifyDataSetChanged()
+                }
+            })
+
             dialogSeleccionarCliente.show()
         }
         dialog.show()
@@ -390,5 +417,12 @@ class VentasFragment : Fragment(), OnItemListClicked {
     override fun onResume() {
         super.onResume()
         carpetaClick()
+    }
+
+    override fun itemListClicked(cliente: Cliente, itemView: View) {
+        // Seleccionar un cliente
+        clienteSeleccionadoTV.setText(cliente.nombreCliente + " " + cliente.nombre2Cliente)
+        clienteSeleccionado = cliente
+        dialogSeleccionarCliente.dismiss()
     }
 }

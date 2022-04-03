@@ -22,14 +22,14 @@
         android:background="@color/verdeclaro"
         android:orientation="horizontal">
 
-        <EditText
+        <TextView
             android:id="@+id/proveedorSeleccionado"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="10"
             android:background="@color/verdeclaro"
-            android:hint="Proveedor"
             android:paddingLeft="20dp"
+            android:gravity="center_vertical"
             android:text="Proveedor"
             android:textColor="@color/black" />
 
