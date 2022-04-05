@@ -12,9 +12,9 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
-import com.example.gestiontienda.Entidades.Tienda
 import com.example.gestiontienda.R
 import com.example.gestiontienda.Utilidades.DatabaseHelper
+import com.example.gestiontienda.Utilidades.ExcelHelper
 import com.example.gestiontienda.Utilidades.Prefs
 
 
@@ -37,6 +37,18 @@ class MenuFragment  () : Fragment() {
         botonTienda.setOnClickListener {
             ajustesTienda(v)
         }
+
+        val botonCopiaSeguridad = v.findViewById(R.id.botonCopiaSeguridad) as Button
+        botonCopiaSeguridad.setOnClickListener {
+
+            val excelUtilities = ExcelHelper()
+            val miExcel = excelUtilities.createWorkbook()
+            excelUtilities.createExcelFile(miExcel , v.context.applicationContext)
+            excelUtilities.updateCell(v.context.applicationContext)
+
+        }
+
+
         return v
     }
 

@@ -112,16 +112,20 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
 
         // Botón Mas
         botonMas.setOnClickListener {
-            var cantidad = cantidadET.text.toString().toInt()
-            cantidad++
-            cantidadET.setText(cantidad.toString())
+            if (cantidadET.text.toString() != "") {
+                var cantidad = cantidadET.text.toString().replace(',', '.').toFloat()
+                cantidad++
+                cantidadET.setText(cantidad.toString())
+            }
         }
 
         // Botón Menos
         botonMenos.setOnClickListener {
-            var cantidad = cantidadET.text.toString().toInt()
-            cantidad--
-            cantidadET.setText(cantidad.toString())
+            if (cantidadET.text.toString() != "") {
+                var cantidad = cantidadET.text.toString().replace(',', '.').toFloat()
+                if (cantidad > 1) cantidad--
+                cantidadET.setText(cantidad.toString())
+            }
         }
 
 
@@ -162,9 +166,9 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         botonVentas.setOnClickListener {
             carpeta = false
             if (productoSeleccionado.codigoProducto != "0") {
-                if (productoSeleccionado.stockProducto >= cantidadET.text.toString().replace(',','.').toInt()){
+                if (productoSeleccionado.stockProducto >= cantidadET.text.toString().replace(',','.').toFloat()){
                     var precioVentaTMP = (precioVentaProductoSeleccionado.text.toString()).replace(",",".").toFloat()
-                    val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().toInt() , productoSeleccionado.precioCompraProducto , precioVentaTMP , productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
+                    val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().replace(',', '.').toFloat() , productoSeleccionado.precioCompraProducto , precioVentaTMP , productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
                     listaProductosVenta.add(productoTmp)
                     carpeta = false
                     hideKeyboard()
@@ -198,14 +202,12 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
         val campo2 = dialog.findViewById(R.id.campo2_tabla) as TextView
         val campo3 = dialog.findViewById(R.id.campo3_tabla) as TextView
-        val campo4 = dialog.findViewById(R.id.campo4_tabla) as TextView
         val campo5 = dialog.findViewById(R.id.campo5_tabla) as TextView
         val botonBorrarEntrada = dialog.findViewById(R.id.boton_borrar_todo_entrada) as Button
         val botonTicket = dialog.findViewById(R.id.boton_resumen_1) as Button
         botonTicket.setText("FINALIZAR VENTA")
         val botonVolverEntrada = dialog.findViewById(R.id.boton_volver_entrada) as Button
         val totalProductos = dialog.findViewById(R.id.total_productos) as TextView
-        val importeTotal = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val totalIVA = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val totalPagar = dialog.findViewById(R.id.importeTotalPagar) as TextView
         val seleccionarClienteIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
@@ -216,13 +218,14 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams
         var campo3params = campo3.layoutParams
-        var campo4params = campo4.layoutParams
         var campo5params = campo5.layoutParams
 
-        var totalproductos = 0
+        var totalproductos = 0f
         var importe_total = 0f
         var totaliva = 0f
         var totalpagar = 0f
+
+        // TODO maquetar el tiquet bien
 
         for (productoTMP in listaProductosVenta) {
             val newRow = TableRow(dialog.context)
@@ -238,7 +241,7 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
             campo2.setTextColor(resources.getColor(R.color.black))
             campo2.gravity = Gravity.RIGHT
             campo2.setPadding(10,10,20,10)
-            campo2.setText(productoTMP.stockProducto.toString())
+            campo2.setText(productoTMP.stockProducto.toString().replace('.',','))
             // Precio
             val campo3 = TextView(dialog.context)
             campo3.layoutParams = campo3params
@@ -246,40 +249,31 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
             campo3.gravity = Gravity.RIGHT
             campo3.setPadding(10,10,20,10)
             campo3.setText(String.format("%.2f", productoTMP.precioVentaProducto).replace('.',','))
-            // IVA
-            val campo4 = TextView(dialog.context)
-            campo4.layoutParams = campo4params
-            campo4.setTextColor(resources.getColor(R.color.black))
-            campo4.gravity = Gravity.RIGHT
-            campo4.setPadding(10,10,20,10)
-            val iva = ((productoTMP.ivaProducto * productoTMP.precioVentaProducto * productoTMP.stockProducto) / 100)
-            totaliva += iva
-            campo4.setText(String.format("%.2f", iva).replace('.',','))
             // SUBTOTAL
             val campo5 = TextView(dialog.context)
             campo5.layoutParams = campo5params
             campo5.setTextColor(resources.getColor(R.color.black))
             campo5.gravity = Gravity.RIGHT
             campo5.setPadding(10,10,20,10)
-            val subtotal = (productoTMP.precioVentaProducto * productoTMP.stockProducto)+ iva
+            val subtotal = (productoTMP.precioVentaProducto * productoTMP.stockProducto)
             totalpagar += subtotal
             campo5.setText(String.format("%.2f", subtotal).replace('.',','))
 
             newRow.addView(campo1)
             newRow.addView(campo2)
             newRow.addView(campo3)
-            newRow.addView(campo4)
             newRow.addView(campo5)
 
             totalproductos += productoTMP.stockProducto
-            importe_total += (productoTMP.precioVentaProducto)
+            importe_total += productoTMP.precioVentaProducto * productoTMP.stockProducto
+            val iva_subtotal = (productoTMP.precioVentaProducto * productoTMP.stockProducto) - ((productoTMP.precioVentaProducto * productoTMP.stockProducto) / (1 + (productoTMP.ivaProducto.toFloat()  / 100)))
+            totaliva += iva_subtotal
             tablaEntrada.addView(newRow)
         }
 
-        totalProductos.setText(totalproductos.toString())
-        importeTotal.setText(String.format("%.2f", importe_total).replace('.',','))
-        totalIVA.setText(String.format("%.2f", totaliva).replace('.',','))
-        totalPagar.setText(String.format("%.2f", totalpagar).replace('.',','))
+        totalProductos.setText("Productos: " + totalproductos.toString().format("%.3f").replace('.' , ','))
+        totalIVA.setText(String.format("IVA: %.2f", totaliva).replace('.',','))
+        totalPagar.setText(String.format("Total: %.2f", totalpagar).replace('.',','))
 
 
         botonBorrarEntrada.setOnClickListener {
@@ -309,13 +303,17 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
             val togglePago = dialogPago.findViewById(R.id.toggleButtonPago) as ToggleButton
 
             botonVentaTicket.setOnClickListener {
-                finalizarVenta(cliente, togglePago.isChecked)
+                var tipopago = "EFECTIVO"
+                if (togglePago.isChecked) tipopago = "BANCO"
+                finalizarVenta(cliente, tipopago)
                 dialogPago.dismiss()
                 dialog.dismiss()
             }
 
             botonVentaFactura.setOnClickListener {
-                finalizarVenta(cliente, togglePago.isChecked)
+                var tipopago = "EFECTIVO"
+                if (togglePago.isChecked) tipopago = "BANCO"
+                finalizarVenta(cliente, tipopago)
                 dialogPago.dismiss()
                 dialog.dismiss()
             }
@@ -368,9 +366,10 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         dialog.show()
     }
 
-    private fun finalizarVenta(cliente : Cliente, pago : Boolean) {
-        databaseHelper.venderProductos(db, listaProductosVenta, cliente, pago)
+    private fun finalizarVenta(cliente : Cliente, pago : String) {
+        databaseHelper.venderProductos(db, listaProductosVenta, cliente, pago, "VENTA")
         listaProductos = databaseHelper.obtenerProductos(db, "","")
+        // TODO actulizar saldo Caja / Banco
         listaProductosVenta.clear()
         carpeta = true
         carpetaClick()
@@ -385,7 +384,7 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
     private fun actualizarProductoSeleccionado() {
         imagenProductoSeleccionado.setImageBitmap(ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoSeleccionado.rutafotoProducto))
         nombreProductoSeleccionado.text = productoSeleccionado.nombreProducto
-        stockProductoSeleccionado.text = productoSeleccionado.stockProducto.toString()
+        stockProductoSeleccionado.text = String.format("%.3f" , productoSeleccionado.stockProducto).replace('.',',')
         precioVentaProductoSeleccionado.setText( (String.format("%.2f" , productoSeleccionado.precioVentaProducto).replace('.',',')))
     }
 

@@ -58,7 +58,7 @@ class RecyclerAdapterVentas : RecyclerView.Adapter<RecyclerAdapterVentas.ViewHol
             nombreProducto.text = producto.nombreProducto
             precioCompraProducto.text = "📄"
             precioVentaProducto.text = String.format("%.2f" , producto.precioVentaProducto).replace('.',',')
-            stockProducto.text =  producto.stockProducto.toString()
+            stockProducto.text =  String.format("%.3f" , producto.stockProducto).replace('.',',')
             ivaProducto.text = producto.ivaProducto.toString()
             codigoProducto.text = producto.codigoProducto.toString()
 

@@ -11,12 +11,12 @@ package com.example.gestiontienda.Entidades
                    MARGEN DE BENEFICIO DEL PRODUCTO
 
  */
-class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProducto : String, stockProducto : Int, precioCompraProducto : Float, precioVentaProducto : Float, ivaProducto : Int , margenProducto : Float) {
+class Producto ( nombreProducto : String, codigoProducto : String , rutafotoProducto : String, stockProducto : Float, precioCompraProducto : Float, precioVentaProducto : Float, ivaProducto : Int , margenProducto : Float) {
 
     var nombreProducto : String
     var codigoProducto : String
     var rutafotoProducto : String
-    var stockProducto : Int
+    var stockProducto : Float
     var precioCompraProducto : Float
     var precioVentaProducto : Float
     var ivaProducto : Int

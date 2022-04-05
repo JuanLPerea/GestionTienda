@@ -224,7 +224,7 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
         botonEntrada.setOnClickListener {
             carpeta = false
             if (productoSeleccionado.codigoProducto != "0") {
-                val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().toInt() , precioCompraProductoSeleccionado.text.toString().toFloat(), productoSeleccionado.precioVentaProducto, productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
+                val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().replace(',', '.').toFloat() , precioCompraProductoSeleccionado.text.toString().toFloat(), productoSeleccionado.precioVentaProducto, productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
                 listaProductosEntrada.add(productoTmp)
                 carpeta = false
                 hideKeyboard()
@@ -236,16 +236,20 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
 
         // Botón Mas
         botonMas.setOnClickListener {
-            var cantidad = cantidadET.text.toString().toInt()
-            cantidad++
-            cantidadET.setText(cantidad.toString())
+            if (cantidadET.text.toString() != "") {
+                var cantidad = cantidadET.text.toString().toInt()
+                cantidad++
+                cantidadET.setText(cantidad.toString())
+            }
         }
 
         // Botón Menos
         botonMenos.setOnClickListener {
-            var cantidad = cantidadET.text.toString().toInt()
-            cantidad--
-            cantidadET.setText(cantidad.toString())
+            if (cantidadET.text.toString() != ""){
+                var cantidad = cantidadET.text.toString().toInt()
+                if (cantidad > 1) cantidad--
+                cantidadET.setText(cantidad.toString())
+            }
         }
 
         // Boton Aceptar entrada
@@ -296,25 +300,26 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
         val campo1 = dialog.findViewById(R.id.campo1_tabla) as TextView
         val campo2 = dialog.findViewById(R.id.campo2_tabla) as TextView
         val campo3 = dialog.findViewById(R.id.campo3_tabla) as TextView
-        val campo4 = dialog.findViewById(R.id.campo4_tabla) as TextView
         val campo5 = dialog.findViewById(R.id.campo5_tabla) as TextView
+        val cajaCheckBox = dialog.findViewById(R.id.caja_checked) as RadioButton
+        val bancoCheckBox = dialog.findViewById(R.id.banco_checked) as RadioButton
         val botonBorrarEntrada = dialog.findViewById(R.id.boton_borrar_todo_entrada) as Button
         val botonDarEntrada = dialog.findViewById(R.id.boton_resumen_1) as Button
         botonDarEntrada.setText("DAR ENTRADA")
         val botonVolverEntrada = dialog.findViewById(R.id.boton_volver_entrada) as Button
         val totalProductos = dialog.findViewById(R.id.total_productos) as TextView
-        val importeTotal = dialog.findViewById(R.id.importeTotalIVA) as TextView
         val seleccionarProveedorIB = dialog.findViewById(R.id.seleccionarProveedorBTN) as ImageButton
         proveedorSeleccionadoTV = dialog.findViewById(R.id.proveedorSeleccionado) as TextView
         proveedorSeleccionadoTV.setText(proveedor.nombreProveedor)
+        val totalIVA = dialog.findViewById(R.id.importeTotalIVA) as TextView
+        val totalPagar = dialog.findViewById(R.id.importeTotalPagar) as TextView
         
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams
         var campo3params = campo3.layoutParams
-        var campo4params = campo4.layoutParams
         var campo5params = campo5.layoutParams
 
-        var totalproductos = 0
+        var totalproductos = 0f
         var importe_total = 0f
         var totaliva = 0f
         var totalpagar = 0f
@@ -333,47 +338,40 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
             campo2.setTextColor(resources.getColor(R.color.black))
             campo2.gravity = Gravity.RIGHT
             campo2.setPadding(10,10,20,10)
-            campo2.setText(productoTMP.stockProducto.toString())
+            campo2.setText(String.format("%.2f", productoTMP.stockProducto).replace('.',','))
 
             val campo3 = TextView(dialog.context)
             campo3.layoutParams = campo3params
             campo3.setTextColor(resources.getColor(R.color.black))
             campo3.gravity = Gravity.RIGHT
             campo3.setPadding(10,10,20,10)
-            campo3.setText(productoTMP.precioCompraProducto.toString())
+            campo3.setText(String.format("%.2f", productoTMP.precioCompraProducto).replace('.',','))
 
-            // IVA
-            val campo4 = TextView(dialog.context)
-            campo4.layoutParams = campo4params
-            campo4.setTextColor(resources.getColor(R.color.black))
-            campo4.gravity = Gravity.RIGHT
-            campo4.setPadding(10,10,20,10)
-            val iva = ((productoTMP.ivaProducto * productoTMP.precioCompraProducto) / 100)
-            totaliva += iva
-            campo4.setText(String.format("%.2f", iva).replace('.',','))
             // SUBTOTAL
             val campo5 = TextView(dialog.context)
             campo5.layoutParams = campo5params
             campo5.setTextColor(resources.getColor(R.color.black))
             campo5.gravity = Gravity.RIGHT
             campo5.setPadding(10,10,20,10)
-            val subtotal = productoTMP.precioCompraProducto + iva
+            val subtotal = (productoTMP.precioCompraProducto * productoTMP.stockProducto)
             totalpagar += subtotal
             campo5.setText(String.format("%.2f", subtotal).replace('.',','))
 
             newRow.addView(campo1)
             newRow.addView(campo2)
             newRow.addView(campo3)
-            newRow.addView(campo4)
             newRow.addView(campo5)
 
             totalproductos += productoTMP.stockProducto
-            importe_total += (productoTMP.precioCompraProducto * productoTMP.stockProducto)
+            importe_total += subtotal
+            val iva_subtotal = (productoTMP.precioCompraProducto * productoTMP.stockProducto) - ((productoTMP.precioCompraProducto * productoTMP.stockProducto) / (1 + (productoTMP.ivaProducto.toFloat()  / 100)))
+            totaliva += iva_subtotal
             tablaEntrada.addView(newRow)
         }
-        
-        totalProductos.setText(totalproductos.toString())
-        importeTotal.setText(importe_total.toString())
+
+        totalProductos.setText("Productos: " + totalproductos.toString().format("%.3f").replace('.' , ','))
+        totalIVA.setText(String.format("IVA: %.2f", totaliva).replace('.',','))
+        totalPagar.setText(String.format("Total: %.2f", totalpagar).replace('.',','))
 
         botonBorrarEntrada.setOnClickListener {
             listaProductosEntrada.clear()
@@ -387,10 +385,13 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
         }
 
         botonDarEntrada.setOnClickListener { vista ->
-            databaseHelper.darEntradaListaProductos(db, listaProductosEntrada, proveedor)
+            var cargo = "BANCO"
+            if (cajaCheckBox.isChecked) cargo = "CAJA"
+            databaseHelper.darEntradaListaProductos(db, listaProductosEntrada, proveedor, cargo, "Compra")
             listaProductos = databaseHelper.obtenerProductos(db, "","")
             listaProductosEntrada.clear()
             carpeta = true
+            Toast.makeText(miContexto, "Mercancía dada entrada al Stock", Toast.LENGTH_LONG).show()
             carpetaClick()
             dialog.dismiss()
         }
@@ -470,7 +471,7 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
     private fun actualizarProductoSeleccionado() {
         imagenProductoSeleccionado.setImageBitmap(ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoSeleccionado.rutafotoProducto))
         nombreProductoSeleccionado.text = productoSeleccionado.nombreProducto
-        stockProductoSeleccionado.text = productoSeleccionado.stockProducto.toString()
+        stockProductoSeleccionado.text = String.format("%.3f" , productoSeleccionado.stockProducto).replace('.',',')
         precioCompraProductoSeleccionado.setText( productoSeleccionado.precioCompraProducto.toString())
     }
 
@@ -495,7 +496,7 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
         val botonCancelar = dialog.findViewById(R.id.boton_cancelar_cliente) as Button
         val imagenProducto = dialog.findViewById(R.id.productoNuevoIV) as ImageView
         bitmapFoto = BitmapFactory.decodeResource(activity!!.resources, R.drawable.nophoto)
-        var stockProducto = 0
+        var stockProducto = 0f
 
         tituloDialogoProducto.setText("Nuevo Producto")
         if (!nuevo) {
@@ -507,10 +508,15 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
             precioVenta.setText(productoTMP.precioVentaProducto.toString())
             ivaProducto.setText(productoTMP.ivaProducto.toString())
             margenProducto.setText(productoTMP.margenProducto.toString().replace('.',','))
-            bitmapFoto = ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoTMP.rutafotoProducto) as Bitmap
+            try {
+                val bitmap = ImagesHelper(activity!!.applicationContext).recuperarImagenMemoriaInterna(productoTMP.rutafotoProducto) as Bitmap
+                bitmapFoto = bitmap
+            } catch (e: Exception) {
+                Log.d("Miapp" , "Error: " + e)
+            }
             imagenProducto.setImageBitmap(bitmapFoto)
             rutaImagenNuevoProducto = productoTMP.rutafotoProducto
-            stockProducto = productoTMP.stockProducto
+            stockProducto = productoTMP.stockProducto.toString().replace(',','.').toFloat()
         }
 
         margenProducto.setOnFocusChangeListener { view, b ->
@@ -579,9 +585,7 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
                     carpetaClick()
                     dialog.dismiss()
                 }
-
             }
-
         }
 
         botonCancelar.setOnClickListener {

@@ -31,7 +31,7 @@ class RecyclerAdapterClientes: RecyclerView.Adapter<RecyclerAdapterClientes.View
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = clientes.get(position)
-        holder.bind(item , context)
+        holder.bind(item)
         holder.itemView.setOnClickListener {
             listener.itemListClicked(item , holder.itemView)
         }
@@ -45,7 +45,7 @@ class RecyclerAdapterClientes: RecyclerView.Adapter<RecyclerAdapterClientes.View
         val nombreCliente = view.findViewById(R.id.nombre_cliente_proveedor_fila) as TextView
         val idCliente = view.findViewById(R.id.codigo_cliente_proveedorTV) as TextView
 
-        fun bind(cliente: Cliente, context: Context) {
+        fun bind(cliente: Cliente) {
             nombreCliente.text = cliente.nombreCliente + " " + cliente.nombre2Cliente
             idCliente.text = cliente.idCliente
         }

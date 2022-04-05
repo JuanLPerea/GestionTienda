@@ -58,9 +58,9 @@ class RecyclerAdapter : RecyclerView.Adapter<RecyclerAdapter.ViewHolder>() {
             nombreProducto.text = producto.nombreProducto
             precioCompraProducto.text = String.format("%.2f" , producto.precioCompraProducto).replace('.',',')
             precioVentaProducto.text = String.format("%.2f" , producto.precioVentaProducto).replace('.',',')
-            stockProducto.text =  producto.stockProducto.toString()
+            stockProducto.text =  String.format("%.3f" , producto.stockProducto).replace('.',',')
             ivaProducto.text = producto.ivaProducto.toString()
-            codigoProducto.text = producto.codigoProducto.toString()
+            codigoProducto.text = producto.codigoProducto
 
             val imagen = imagesHelper.recuperarImagenMemoriaInterna(producto.rutafotoProducto)
             if (imagen == null) {
