@@ -223,15 +223,12 @@ class ProductosFragment : Fragment(), OnItemListClicked , OnProveedorListClicked
         // Boton entrada
         botonEntrada.setOnClickListener {
             carpeta = false
-            if (productoSeleccionado.codigoProducto != "0") {
                 val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().replace(',', '.').toFloat() , precioCompraProductoSeleccionado.text.toString().toFloat(), productoSeleccionado.precioVentaProducto, productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
                 listaProductosEntrada.add(productoTmp)
                 carpeta = false
                 hideKeyboard()
                 carpetaClick()
-            } else {
-                Toast.makeText(context, "Selecciona un Producto" , Toast.LENGTH_LONG).show()
-            }
+
         }
 
         // Botón Mas

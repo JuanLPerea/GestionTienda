@@ -100,6 +100,7 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         // Recycler View
         listaProductos = databaseHelper.obtenerProductos(db, "","")
         productoSeleccionado = listaProductos.first()
+        actualizarProductoSeleccionado()
 
 
         mRecyclerView = v.findViewById(R.id.recycler_clientesRV) as RecyclerView
@@ -165,7 +166,9 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         // Boton Vender
         botonVentas.setOnClickListener {
             carpeta = false
-            if (productoSeleccionado.codigoProducto != "0") {
+
+            // TODO comprobar que se haya seleccionado algún producto
+            if (productoSeleccionado.codigoProducto != "") {
                 if (productoSeleccionado.stockProducto >= cantidadET.text.toString().replace(',','.').toFloat()){
                     var precioVentaTMP = (precioVentaProductoSeleccionado.text.toString()).replace(",",".").toFloat()
                     val productoTmp = Producto(productoSeleccionado.nombreProducto, productoSeleccionado.codigoProducto, productoSeleccionado.rutafotoProducto, cantidadET.text.toString().replace(',', '.').toFloat() , productoSeleccionado.precioCompraProducto , precioVentaTMP , productoSeleccionado.ivaProducto , productoSeleccionado.margenProducto)
