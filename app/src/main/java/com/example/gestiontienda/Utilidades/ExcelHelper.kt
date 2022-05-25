@@ -19,10 +19,12 @@ class ExcelHelper {
 
         //Creating a sheet called "statSheet" inside the workbook and then add data to it
         val tiendaSheet: Sheet = ourWorkbook.createSheet("Datos Tienda")
+        val productosSheet: Sheet = ourWorkbook.createSheet("Productos")
         val clientesSheet : Sheet = ourWorkbook.createSheet("Clientes")
         val proveedoresSheet : Sheet = ourWorkbook.createSheet("Proveedores")
         val entradasSheet: Sheet = ourWorkbook.createSheet("Entradas")
         val salidasSheet: Sheet = ourWorkbook.createSheet("Salidas")
+
 
          // Añadir los datos de la tienda en su tabla
          val tienda = databaseHelper.obtenerTienda(db)
@@ -77,6 +79,33 @@ class ExcelHelper {
              createCell(rowCliente, 10, cliente.referenciaCliente)
          }
 
+
+         // Añadir la lista de los productos
+         // Encabezado
+         //     val CREATE_TABLE_PRODUCTOS = "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK TEXT, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER, MARGENPRODUCTO TEXT)"
+         //
+         val encabezadoProductos = productosSheet.createRow(0)
+         createCell(encabezadoProductos, 0, "NOMBREPRODUCTO")
+         createCell(encabezadoProductos, 1, "CODIGOPRODUCTO")
+         createCell(encabezadoProductos, 2, "RUTAFOTOPRODUCTO")
+         createCell(encabezadoProductos, 3, "PRECIOCOMPRAPRODUCTO")
+         createCell(encabezadoProductos, 4, "PRECIOVENTAPRODUCTO")
+         createCell(encabezadoProductos, 5, "IVAPRODUCTO")
+         createCell(encabezadoProductos, 6, "MARGENPRODUCTO")
+
+         val listaProductos = databaseHelper.obtenerProductos(db,"","")
+         listaProductos.forEachIndexed() { index , producto ->
+             val rowProducto = productosSheet.createRow(index + 1)
+             createCell(rowProducto, 0, producto.nombreProducto)
+             createCell(rowProducto, 1, producto.codigoProducto)
+             createCell(rowProducto, 2, producto.rutafotoProducto)
+             createCell(rowProducto, 3, producto.precioCompraProducto.toString())
+             createCell(rowProducto, 4, producto.precioVentaProducto.toString())
+             createCell(rowProducto, 5, producto.ivaProducto.toString())
+             createCell(rowProducto, 6, producto.margenProducto.toString())
+
+         }
+
          // Añadir la lista de los proveedores
          // Encabezado
          val encabezado_proveedor = proveedoresSheet.createRow(0)
@@ -110,7 +139,7 @@ class ExcelHelper {
          
          // Añadir lista de entradas en su tabla correspondiente
          // Encabezado
-         val encabezado_entradas = proveedoresSheet.createRow(0)
+         val encabezado_entradas = entradasSheet.createRow(0)
          createCell(encabezado_entradas, 0, "ID")
          createCell(encabezado_entradas, 1, "FECHA")
          createCell(encabezado_entradas, 2, "TIPO ENTRADA")
@@ -119,24 +148,26 @@ class ExcelHelper {
          createCell(encabezado_entradas, 5, "UNIDADES")
          createCell(encabezado_entradas, 6, "PRECIO COMPRA")
          createCell(encabezado_entradas, 7, "CARGADO EN")
+         createCell(encabezado_entradas, 8, "IVA")
 
         // Datos
          val listaEntradas = databaseHelper.obtenerEntradas(db)
          listaEntradas.forEachIndexed() { index , entrada ->
-             val rowProveedor = proveedoresSheet.createRow(index + 1)
-             createCell(rowProveedor, 0, entrada.idEntrada)
-             createCell(rowProveedor, 1, entrada.fechaEntrada)
-             createCell(rowProveedor, 2, entrada.tipoEntrada)
-             createCell(rowProveedor, 3, entrada.proveedorEntrada)
-             createCell(rowProveedor, 4, entrada.productoEntrada)
-             createCell(rowProveedor, 5, entrada.unidadesEntrada.toString())
-             createCell(rowProveedor, 6, entrada.precioEntrada.toString())
-             createCell(rowProveedor, 7, entrada.cargo)
+             val rowEntrada = entradasSheet.createRow(index + 1)
+             createCell(rowEntrada, 0, entrada.idEntrada)
+             createCell(rowEntrada, 1, entrada.fechaEntrada)
+             createCell(rowEntrada, 2, entrada.tipoEntrada)
+             createCell(rowEntrada, 3, entrada.proveedorEntrada)
+             createCell(rowEntrada, 4, entrada.productoEntrada)
+             createCell(rowEntrada, 5, entrada.unidadesEntrada.toString())
+             createCell(rowEntrada, 6, entrada.precioEntrada.toString())
+             createCell(rowEntrada, 7, entrada.cargo)
+             createCell(encabezado_entradas, 8, entrada.iva.toString())
          }
 
          // Añadir lista de salidas en su tabla correspondiente
          // Encabezado
-         val encabezado_salidas = proveedoresSheet.createRow(0)
+         val encabezado_salidas = salidasSheet.createRow(0)
          createCell(encabezado_salidas, 0, "ID")
          createCell(encabezado_salidas, 1, "FECHA")
          createCell(encabezado_salidas, 2, "TIPO ENTRADA")
@@ -145,19 +176,21 @@ class ExcelHelper {
          createCell(encabezado_salidas, 5, "UNIDADES")
          createCell(encabezado_salidas, 6, "PRECIO COMPRA")
          createCell(encabezado_salidas, 7, "CARGADO EN")
+         createCell(encabezado_salidas, 8, "IVA")
 
          // Datos
          val listaSalidas = databaseHelper.obtenerSalidas(db)
          listaSalidas.forEachIndexed() { index , salida ->
-             val rowProveedor = proveedoresSheet.createRow(index + 1)
-             createCell(rowProveedor, 0, salida.idSalida)
-             createCell(rowProveedor, 1, salida.fechaSalida)
-             createCell(rowProveedor, 2, salida.tipoSalida)
-             createCell(rowProveedor, 3, salida.proveedorSalida)
-             createCell(rowProveedor, 4, salida.productoSalida)
-             createCell(rowProveedor, 5, salida.unidadesSalida.toString())
-             createCell(rowProveedor, 6, salida.precioSalida.toString())
-             createCell(rowProveedor, 7, salida.cargo)
+             val rowSalida = salidasSheet.createRow(index + 1)
+             createCell(rowSalida, 0, salida.idSalida)
+             createCell(rowSalida, 1, salida.fechaSalida)
+             createCell(rowSalida, 2, salida.tipoSalida)
+             createCell(rowSalida, 3, salida.proveedorSalida)
+             createCell(rowSalida, 4, salida.productoSalida)
+             createCell(rowSalida, 5, salida.unidadesSalida.toString())
+             createCell(rowSalida, 6, salida.precioSalida.toString())
+             createCell(rowSalida, 7, salida.cargo)
+             createCell(rowSalida, 8, salida.iva.toString())
          }
 
          return ourWorkbook
@@ -186,7 +219,7 @@ class ExcelHelper {
         }
 
         //Create an excel file called test.xlsx
-        val excelFile = File(ourAppFileDirectory, "test.xlsx")
+        val excelFile = File(ourAppFileDirectory, "copia_tienda.xlsx")
 
         //Write a workbook to the file using a file outputstream
         try {

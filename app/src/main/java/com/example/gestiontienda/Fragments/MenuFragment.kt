@@ -42,9 +42,8 @@ class MenuFragment  () : Fragment() {
         botonCopiaSeguridad.setOnClickListener {
 
             val excelUtilities = ExcelHelper()
-            val miExcel = excelUtilities.createWorkbook()
+            val miExcel = excelUtilities.createWorkbook(databaseHelper)
             excelUtilities.createExcelFile(miExcel , v.context.applicationContext)
-            excelUtilities.updateCell(v.context.applicationContext)
 
         }
 

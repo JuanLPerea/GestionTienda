@@ -1,17 +1,10 @@
 package com.example.gestiontienda.Utilidades
 
-import android.app.Dialog
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
-import android.view.View
-import android.view.Window
-import android.widget.Button
-import android.widget.EditText
 import com.example.gestiontienda.Entidades.*
-import com.example.gestiontienda.R
-import java.text.SimpleDateFormat
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -94,9 +87,9 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         val CREATE_TABLE_TIENDA = "CREATE TABLE TIENDA (NOMBRETIENDA TEXT, DIRECCION TEXT, TELEFONO TEXT, EMAIL TEXT, CIF TEXT, OTROSDATOS TEXT)"
         val CREATE_TABLE_PRODUCTOS = "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK TEXT, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER, MARGENPRODUCTO TEXT)"
         val CREATE_TABLE_CLIENTES = "CREATE TABLE CLIENTES (IDCLIENTE ID, NOMBRECLIENTE TEXT, APELLIDOSCLIENTE TEXT, DIRECCIONCLIENTE TEXT, CIUDADCLIENTE TEXT, PROVINCIACLIENTE TEXT, CODIGOPOSTALCLIENTE TEXT, CIFCLIENTE TEXT, TELEFONOCLIENTE TEXT, EMAILCLIENTE TEXT, REFERENCIACLIENTE TEXT)"
-        val CREATE_TABLE_SALIDAS = "CREATE TABLE SALIDAS (IDSALIDA ID, FECHA TEXT, TIPOSALIDA TEXT, CLIENTEID TEXT , PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOVENTA FLOAT, CARGO TEXT)"
+        val CREATE_TABLE_SALIDAS = "CREATE TABLE SALIDAS (IDSALIDA ID, FECHA TEXT, TIPOSALIDA TEXT, CLIENTEID TEXT , PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOVENTA FLOAT, CARGO TEXT, IVA INTEGER)"
         val CREATE_TABLE_PROVEEDORES = "CREATE TABLE PROVEEDORES (IDPROVEEDOR ID, NOMBREPROVEEDOR TEXT, APELLIDOSPROVEEDOR TEXT, DIRECCIONPROVEEDOR TEXT, CIUDADPROVEEDOR TEXT, PROVINCIAPROVEEDOR TEXT, CODIGOPOSTALPROVEEDOR TEXT, CIFPROVEEDOR TEXT, TELEFONOPROVEDOR TEXT, EMAILPROVEEDOR TEXT, REFERENCIAPROVEEDOR TEXT)"
-        val CREATE_TABLE_ENTRADAS = "CREATE TABLE ENTRADAS (IDENTRADA TEXT, FECHA TEXT, TIPOENTRADA TEXT, PROVEEDORID TEXT, PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOCOMPRA FLOAT, CARGO TEXT )"
+        val CREATE_TABLE_ENTRADAS = "CREATE TABLE ENTRADAS (IDENTRADA TEXT, FECHA TEXT, TIPOENTRADA TEXT, PROVEEDORID TEXT, PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOCOMPRA FLOAT, CARGO TEXT, IVA INTEGER)"
         val CREATE_TABLE_CAJA = "CREATE TABLE CAJA (CAJAID ID, SALDO FLOAT)"
         val CREATE_TABLE_BANCO = "CREATE TABLE BANCO (BANCOID ID, SALDO FLOAT)"
         db!!.execSQL(CREATE_TABLE_TIENDA)
@@ -409,7 +402,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             db!!.execSQL(UPDATE_PRODUCTO)
 
             // Añadir venta en la BD
-            val UPDATE_VENTA = "INSERT INTO SALIDAS VALUES ('" + ventaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + cliente.idCliente + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioVentaProducto + "' , '" + modopago + "')"
+            val UPDATE_VENTA = "INSERT INTO SALIDAS VALUES ('" + ventaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + cliente.idCliente + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioVentaProducto + "' , '" + modopago + "' , '" + producto.ivaProducto + "')"
             db!!.execSQL(UPDATE_VENTA)
 
         }
@@ -428,7 +421,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             db!!.execSQL(UPDATE_PRODUCTO)
 
             // Añadir entrada en la BD
-            val UPDATE_ENTRADA = "INSERT INTO ENTRADAS VALUES ('" + entradaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + proveedor.idProveedor + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + cargo + "')"
+            val UPDATE_ENTRADA = "INSERT INTO ENTRADAS VALUES ('" + entradaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + proveedor.idProveedor + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + cargo + "' , '" + producto.ivaProducto  + "')"
             db!!.execSQL(UPDATE_ENTRADA)
         }
 
@@ -504,20 +497,24 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             do {
                 val idEntradaTMP = datosBruto.getString(datosBruto.getColumnIndex("IDENTRADA"))
                 val fechaTMP = datosBruto.getString(datosBruto.getColumnIndex("FECHA"))
+                val tipoEntradaTMP = datosBruto.getString(datosBruto.getColumnIndex("TIPOENTRADA"))
                 val proveedorIDTMP = datosBruto.getString(datosBruto.getColumnIndex("PROVEEDORID"))
                 val productoIDTMP = datosBruto.getString(datosBruto.getColumnIndex("PRODUCTOID"))
                 val unidadesTMP = datosBruto.getFloat(datosBruto.getColumnIndex("UNIDADES"))
                 val precioCompraTMP = datosBruto.getFloat(datosBruto.getColumnIndex("PRECIOCOMPRA"))
                 val cargoTMP = datosBruto.getString(datosBruto.getColumnIndex("CARGO"))
+                val ivaTMP = datosBruto.getInt(datosBruto.getColumnIndex("IVA"))
 
-                val entradaTMP = Entrada("","","","","",0f, 0f, "")
+                val entradaTMP = Entrada("","","","","",0f, 0f, "", 0)
                 entradaTMP.idEntrada = idEntradaTMP
                 entradaTMP.fechaEntrada = fechaTMP
+                entradaTMP.tipoEntrada = tipoEntradaTMP
                 entradaTMP.proveedorEntrada = proveedorIDTMP
                 entradaTMP.productoEntrada = productoIDTMP
                 entradaTMP.unidadesEntrada = unidadesTMP
                 entradaTMP.precioEntrada = precioCompraTMP
                 entradaTMP.cargo = cargoTMP
+                entradaTMP.iva = ivaTMP
 
                 misEntradas.add(entradaTMP)
             } while (datosBruto.moveToNext())
@@ -525,6 +522,40 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         datosBruto.close()
 
         return misEntradas
+    }
+
+    fun obtenerSalidas (db : SQLiteDatabase) : MutableList<Salida> {
+        var misSalidas : MutableList<Salida> = mutableListOf()
+        val datosBruto = db.rawQuery("SELECT * FROM SALIDAS", null)
+        if (datosBruto!!.moveToFirst()) {
+            do {
+                val idSalidaTMP = datosBruto.getString(datosBruto.getColumnIndex("IDSALIDA"))
+                val fechaTMP = datosBruto.getString(datosBruto.getColumnIndex("FECHA"))
+                val tipoSalidaTMP = datosBruto.getString(datosBruto.getColumnIndex("TIPOSALIDA"))
+                val proveedorIDTMP = datosBruto.getString(datosBruto.getColumnIndex("CLIENTEID"))
+                val productoIDTMP = datosBruto.getString(datosBruto.getColumnIndex("PRODUCTOID"))
+                val unidadesTMP = datosBruto.getFloat(datosBruto.getColumnIndex("UNIDADES"))
+                val precioCompraTMP = datosBruto.getFloat(datosBruto.getColumnIndex("PRECIOVENTA"))
+                val cargoTMP = datosBruto.getString(datosBruto.getColumnIndex("CARGO"))
+                val ivaTMP = datosBruto.getInt(datosBruto.getColumnIndex("IVA"))
+
+                val salidaTMP = Salida("","","","","",0f, 0f, "", 0)
+                salidaTMP.idSalida = idSalidaTMP
+                salidaTMP.fechaSalida = fechaTMP
+                salidaTMP.tipoSalida = tipoSalidaTMP
+                salidaTMP.proveedorSalida = proveedorIDTMP
+                salidaTMP.productoSalida = productoIDTMP
+                salidaTMP.unidadesSalida = unidadesTMP
+                salidaTMP.precioSalida = precioCompraTMP
+                salidaTMP.cargo = cargoTMP
+                salidaTMP.iva = ivaTMP
+
+                misSalidas.add(salidaTMP)
+            } while (datosBruto.moveToNext())
+        }
+        datosBruto.close()
+
+        return misSalidas
     }
 
 

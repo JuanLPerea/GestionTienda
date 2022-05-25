@@ -10,7 +10,7 @@ package com.example.gestiontienda.Entidades
                  CARGO (BANCO, CAJA, VALOR_STOCK)
                  IVA
  */
-class Salida (idSalida : String, fechaSalida : String, tipoSalida : String, proveedorSalida : String, productoSalida : String, unidadesSalida : Float, precioSalida : Float, cargo : String){
+class Salida (idSalida : String, fechaSalida : String, tipoSalida : String, proveedorSalida : String, productoSalida : String, unidadesSalida : Float, precioSalida : Float, cargo : String, iva : Int){
     var idSalida : String
     var fechaSalida : String
     var tipoSalida : String
@@ -19,6 +19,7 @@ class Salida (idSalida : String, fechaSalida : String, tipoSalida : String, prov
     var unidadesSalida : Float
     var precioSalida : Float
     var cargo : String
+    var iva : Int
 
     init {
         this.idSalida = idSalida
@@ -29,6 +30,7 @@ class Salida (idSalida : String, fechaSalida : String, tipoSalida : String, prov
         this.unidadesSalida = unidadesSalida
         this.precioSalida = precioSalida
         this.cargo = cargo
+        this.iva = iva
     }
 
 }
