@@ -94,7 +94,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         val CREATE_TABLE_TIENDA = "CREATE TABLE TIENDA (NOMBRETIENDA TEXT, DIRECCION TEXT, TELEFONO TEXT, EMAIL TEXT, CIF TEXT, OTROSDATOS TEXT)"
         val CREATE_TABLE_PRODUCTOS = "CREATE TABLE PRODUCTOS (NOMBREPRODUCTO TEXT, CODIGOPRODUCTO TEXT, RUTAFOTOPRODUCTO TEXT, STOCK TEXT, PRECIOCOMPRAPRODUCTO TEXT, PRECIOVENTAPRODUCTO TEXT, IVAPRODUCTO INTEGER, MARGENPRODUCTO TEXT)"
         val CREATE_TABLE_CLIENTES = "CREATE TABLE CLIENTES (IDCLIENTE ID, NOMBRECLIENTE TEXT, APELLIDOSCLIENTE TEXT, DIRECCIONCLIENTE TEXT, CIUDADCLIENTE TEXT, PROVINCIACLIENTE TEXT, CODIGOPOSTALCLIENTE TEXT, CIFCLIENTE TEXT, TELEFONOCLIENTE TEXT, EMAILCLIENTE TEXT, REFERENCIACLIENTE TEXT)"
-        val CREATE_TABLE_SALIDAS = "CREATE TABLE SALIDAS (IDSALIDA ID, FECHA TEXT, TIPOSALIDA TEXT, PROVEEDORID TEXT , PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOVENTA FLOAT, CARGO TEXT)"
+        val CREATE_TABLE_SALIDAS = "CREATE TABLE SALIDAS (IDSALIDA ID, FECHA TEXT, TIPOSALIDA TEXT, CLIENTEID TEXT , PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOVENTA FLOAT, CARGO TEXT)"
         val CREATE_TABLE_PROVEEDORES = "CREATE TABLE PROVEEDORES (IDPROVEEDOR ID, NOMBREPROVEEDOR TEXT, APELLIDOSPROVEEDOR TEXT, DIRECCIONPROVEEDOR TEXT, CIUDADPROVEEDOR TEXT, PROVINCIAPROVEEDOR TEXT, CODIGOPOSTALPROVEEDOR TEXT, CIFPROVEEDOR TEXT, TELEFONOPROVEDOR TEXT, EMAILPROVEEDOR TEXT, REFERENCIAPROVEEDOR TEXT)"
         val CREATE_TABLE_ENTRADAS = "CREATE TABLE ENTRADAS (IDENTRADA TEXT, FECHA TEXT, TIPOENTRADA TEXT, PROVEEDORID TEXT, PRODUCTOID TEXT, UNIDADES INTEGER, PRECIOCOMPRA FLOAT, CARGO TEXT )"
         val CREATE_TABLE_CAJA = "CREATE TABLE CAJA (CAJAID ID, SALDO FLOAT)"
@@ -409,7 +409,7 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
             db!!.execSQL(UPDATE_PRODUCTO)
 
             // Añadir venta en la BD
-            val UPDATE_VENTA = "INSERT INTO SALIDAS VALUES ('" + ventaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + cliente.idCliente + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioCompraProducto + "' , '" + modopago + "')"
+            val UPDATE_VENTA = "INSERT INTO SALIDAS VALUES ('" + ventaID + "' , '" + hoy + "' , '" + tipoEntrada + "' , '" + cliente.idCliente + "' , '" + producto.codigoProducto + "' , '" + producto.stockProducto + "' , '" + producto.precioVentaProducto + "' , '" + modopago + "')"
             db!!.execSQL(UPDATE_VENTA)
 
         }
@@ -492,6 +492,39 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
     fun borrarProveedor(db: SQLiteDatabase, proveedor: Proveedor) {
         val DELETE_PROVEEDOR = "DELETE FROM PROVEEDORES WHERE IDPROVEEDOR = '" + proveedor.idProveedor + "'"
         db!!.execSQL(DELETE_PROVEEDOR)
+    }
+
+
+    fun obtenerEntradas (db : SQLiteDatabase) : MutableList<Entrada> {
+        var misEntradas : MutableList<Entrada> = mutableListOf()
+
+        val datosBruto = db.rawQuery("SELECT * FROM ENTRADAS", null)
+
+        if (datosBruto!!.moveToFirst()) {
+            do {
+                val idEntradaTMP = datosBruto.getString(datosBruto.getColumnIndex("IDENTRADA"))
+                val fechaTMP = datosBruto.getString(datosBruto.getColumnIndex("FECHA"))
+                val proveedorIDTMP = datosBruto.getString(datosBruto.getColumnIndex("PROVEEDORID"))
+                val productoIDTMP = datosBruto.getString(datosBruto.getColumnIndex("PRODUCTOID"))
+                val unidadesTMP = datosBruto.getFloat(datosBruto.getColumnIndex("UNIDADES"))
+                val precioCompraTMP = datosBruto.getFloat(datosBruto.getColumnIndex("PRECIOCOMPRA"))
+                val cargoTMP = datosBruto.getString(datosBruto.getColumnIndex("CARGO"))
+
+                val entradaTMP = Entrada("","","","","",0f, 0f, "")
+                entradaTMP.idEntrada = idEntradaTMP
+                entradaTMP.fechaEntrada = fechaTMP
+                entradaTMP.proveedorEntrada = proveedorIDTMP
+                entradaTMP.productoEntrada = productoIDTMP
+                entradaTMP.unidadesEntrada = unidadesTMP
+                entradaTMP.precioEntrada = precioCompraTMP
+                entradaTMP.cargo = cargoTMP
+
+                misEntradas.add(entradaTMP)
+            } while (datosBruto.moveToNext())
+        }
+        datosBruto.close()
+
+        return misEntradas
     }
 
 

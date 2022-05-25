@@ -2,63 +2,167 @@ package com.example.gestiontienda.Utilidades
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.database.sqlite.SQLiteDatabase
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.*
 
 class ExcelHelper {
 
-     fun createWorkbook(): Workbook {
+     fun createWorkbook(databaseHelper : DatabaseHelper): Workbook {
+
+         // Instanciar Base de Datos SQLite
+         val db = databaseHelper.writableDatabase
+
         // Creating a workbook object from the XSSFWorkbook() class
         val ourWorkbook = XSSFWorkbook()
 
         //Creating a sheet called "statSheet" inside the workbook and then add data to it
-        val sheet: Sheet = ourWorkbook.createSheet("statSheet")
-        ourWorkbook.createSheet("testSheet")
-        addData(sheet)
+        val tiendaSheet: Sheet = ourWorkbook.createSheet("Datos Tienda")
+        val clientesSheet : Sheet = ourWorkbook.createSheet("Clientes")
+        val proveedoresSheet : Sheet = ourWorkbook.createSheet("Proveedores")
+        val entradasSheet: Sheet = ourWorkbook.createSheet("Entradas")
+        val salidasSheet: Sheet = ourWorkbook.createSheet("Salidas")
 
-        return ourWorkbook
+         // Añadir los datos de la tienda en su tabla
+         val tienda = databaseHelper.obtenerTienda(db)
+         //Creating rows at passed in indices
+         val row1 = tiendaSheet.createRow(0)
+         val row2 = tiendaSheet.createRow(1)
+         val row3 = tiendaSheet.createRow(2)
+         val row4 = tiendaSheet.createRow(3)
+         val row5 = tiendaSheet.createRow(4)
+         val row6 = tiendaSheet.createRow(5)
+         createCell(row1, 0, "Nombre de la Tienda")
+         createCell(row1, 1, tienda.nombreTienda)
+         createCell(row2, 0, "Dirección")
+         createCell(row2, 1, tienda.direccionTienda)
+         createCell(row3, 0, "CIF")
+         createCell(row3, 1, tienda.cifTienda)
+         createCell(row4, 0, "e-mail")
+         createCell(row4, 1, tienda.emailTienda)
+         createCell(row5, 0, "Teléfono")
+         createCell(row5, 1, tienda.telefonoTienda)
+         createCell(row6, 0, "Otros datos")
+         createCell(row6, 1, tienda.otrosDatosTienda)
+
+         // Añadir la lista de los clientes
+         // Encabezado
+         val encabezado = clientesSheet.createRow(0)
+         createCell(encabezado, 0, "ID")
+         createCell(encabezado, 1, "NOMBRE")
+         createCell(encabezado, 2, "APELLIDOS")
+         createCell(encabezado, 3, "DIRECCIÓN")
+         createCell(encabezado, 4, "CIUDAD")
+         createCell(encabezado, 5, "PROVINCIA")
+         createCell(encabezado, 6, "CÓDIGO POSTAL")
+         createCell(encabezado, 7, "CIF")
+         createCell(encabezado, 8, "TELÉFONO")
+         createCell(encabezado, 9, "E-MAIL")
+         createCell(encabezado, 10, "REFERENCIA")
+         
+         val listaClientes = databaseHelper.obtenerClientes(db,"","")
+         listaClientes.forEachIndexed() { index , cliente ->
+             val rowCliente = clientesSheet.createRow(index + 1)
+             createCell(rowCliente, 0, cliente.idCliente)
+             createCell(rowCliente, 1, cliente.nombreCliente)
+             createCell(rowCliente, 2, cliente.nombre2Cliente)
+             createCell(rowCliente, 3, cliente.direccionCliente)
+             createCell(rowCliente, 4, cliente.ciudadCliente)
+             createCell(rowCliente, 5, cliente.provinciaCliente)
+             createCell(rowCliente, 6, cliente.cpCliente.toString())
+             createCell(rowCliente, 7, cliente.cifCliente)
+             createCell(rowCliente, 8, cliente.telefonoCliente)
+             createCell(rowCliente, 9, cliente.emailCliente)
+             createCell(rowCliente, 10, cliente.referenciaCliente)
+         }
+
+         // Añadir la lista de los proveedores
+         // Encabezado
+         val encabezado_proveedor = proveedoresSheet.createRow(0)
+         createCell(encabezado_proveedor, 0, "ID")
+         createCell(encabezado_proveedor, 1, "NOMBRE")
+         createCell(encabezado_proveedor, 2, "APELLIDOS")
+         createCell(encabezado_proveedor, 3, "DIRECCIÓN")
+         createCell(encabezado_proveedor, 4, "CIUDAD")
+         createCell(encabezado_proveedor, 5, "PROVINCIA")
+         createCell(encabezado_proveedor, 6, "CÓDIGO POSTAL")
+         createCell(encabezado_proveedor, 7, "CIF")
+         createCell(encabezado_proveedor, 8, "TELÉFONO")
+         createCell(encabezado_proveedor, 9, "E-MAIL")
+         createCell(encabezado_proveedor, 10, "REFERENCIA")
+
+         val listaProveedores = databaseHelper.obtenerProveedores(db,"","")
+         listaProveedores.forEachIndexed() { index , proveedor ->
+             val rowProveedor = proveedoresSheet.createRow(index + 1)
+             createCell(rowProveedor, 0, proveedor.idProveedor)
+             createCell(rowProveedor, 1, proveedor.nombreProveedor)
+             createCell(rowProveedor, 2, proveedor.nombre2Proveedor)
+             createCell(rowProveedor, 3, proveedor.direccionProveedor)
+             createCell(rowProveedor, 4, proveedor.ciudadProveedor)
+             createCell(rowProveedor, 5, proveedor.provinciaProveedor)
+             createCell(rowProveedor, 6, proveedor.cpProveedor.toString())
+             createCell(rowProveedor, 7, proveedor.cifProveedor)
+             createCell(rowProveedor, 8, proveedor.telefonoProveedor)
+             createCell(rowProveedor, 9, proveedor.emailProveedor)
+             createCell(rowProveedor, 10, proveedor.referenciaProveedor)
+         }
+         
+         // Añadir lista de entradas en su tabla correspondiente
+         // Encabezado
+         val encabezado_entradas = proveedoresSheet.createRow(0)
+         createCell(encabezado_entradas, 0, "ID")
+         createCell(encabezado_entradas, 1, "FECHA")
+         createCell(encabezado_entradas, 2, "TIPO ENTRADA")
+         createCell(encabezado_entradas, 3, "PROVEEDOR ID")
+         createCell(encabezado_entradas, 4, "PRODUCTO ID")
+         createCell(encabezado_entradas, 5, "UNIDADES")
+         createCell(encabezado_entradas, 6, "PRECIO COMPRA")
+         createCell(encabezado_entradas, 7, "CARGADO EN")
+
+        // Datos
+         val listaEntradas = databaseHelper.obtenerEntradas(db)
+         listaEntradas.forEachIndexed() { index , entrada ->
+             val rowProveedor = proveedoresSheet.createRow(index + 1)
+             createCell(rowProveedor, 0, entrada.idEntrada)
+             createCell(rowProveedor, 1, entrada.fechaEntrada)
+             createCell(rowProveedor, 2, entrada.tipoEntrada)
+             createCell(rowProveedor, 3, entrada.proveedorEntrada)
+             createCell(rowProveedor, 4, entrada.productoEntrada)
+             createCell(rowProveedor, 5, entrada.unidadesEntrada.toString())
+             createCell(rowProveedor, 6, entrada.precioEntrada.toString())
+             createCell(rowProveedor, 7, entrada.cargo)
+         }
+
+         // Añadir lista de salidas en su tabla correspondiente
+         // Encabezado
+         val encabezado_salidas = proveedoresSheet.createRow(0)
+         createCell(encabezado_salidas, 0, "ID")
+         createCell(encabezado_salidas, 1, "FECHA")
+         createCell(encabezado_salidas, 2, "TIPO ENTRADA")
+         createCell(encabezado_salidas, 3, "PROVEEDOR ID")
+         createCell(encabezado_salidas, 4, "PRODUCTO ID")
+         createCell(encabezado_salidas, 5, "UNIDADES")
+         createCell(encabezado_salidas, 6, "PRECIO COMPRA")
+         createCell(encabezado_salidas, 7, "CARGADO EN")
+
+         // Datos
+         val listaSalidas = databaseHelper.obtenerSalidas(db)
+         listaSalidas.forEachIndexed() { index , salida ->
+             val rowProveedor = proveedoresSheet.createRow(index + 1)
+             createCell(rowProveedor, 0, salida.idSalida)
+             createCell(rowProveedor, 1, salida.fechaSalida)
+             createCell(rowProveedor, 2, salida.tipoSalida)
+             createCell(rowProveedor, 3, salida.proveedorSalida)
+             createCell(rowProveedor, 4, salida.productoSalida)
+             createCell(rowProveedor, 5, salida.unidadesSalida.toString())
+             createCell(rowProveedor, 6, salida.precioSalida.toString())
+             createCell(rowProveedor, 7, salida.cargo)
+         }
+
+         return ourWorkbook
     }
-
-     fun addData(sheet: Sheet) {
-
-        //Creating rows at passed in indices
-        val row1 = sheet.createRow(0)
-        val row2 = sheet.createRow(1)
-        val row3 = sheet.createRow(2)
-        val row4 = sheet.createRow(3)
-        val row5 = sheet.createRow(4)
-        val row6 = sheet.createRow(5)
-        val row7 = sheet.createRow(6)
-        val row8 = sheet.createRow(7)
-
-
-        //Adding data to each  cell
-        createCell(row1, 0, "Name")
-        createCell(row1, 1, "Score")
-
-        createCell(row2, 0, "Mike")
-        createCell(row2, 1, "470")
-
-        createCell(row3, 0, "Montessori")
-        createCell(row3, 1, "460")
-
-        createCell(row4, 0, "Sandra")
-        createCell(row4, 1, "380")
-
-        createCell(row5, 0, "Moringa")
-        createCell(row5, 1, "300")
-
-        createCell(row6, 0, "Torres")
-        createCell(row6, 1, "270")
-
-        createCell(row7, 0, "McGee")
-        createCell(row7, 1, "420")
-
-        createCell(row8, 0, "Gibbs")
-        createCell(row8, 1, "510")
-
-    }
+    
 
     //function for creating a cell.
      fun createCell(sheetRow: Row, columnIndex: Int, cellValue: String?) {

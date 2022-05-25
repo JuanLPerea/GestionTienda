@@ -217,6 +217,8 @@ class VentasFragment : Fragment(), OnItemListClicked , OnClienteListClicked {
         clienteSeleccionadoTV = dialog.findViewById(R.id.proveedorSeleccionado)
         clienteSeleccionadoTV.setText(cliente.nombreCliente)
         encabezadoDialogoProductos.setText("Carrito de la Compra")
+        val lineartipopago = dialog.findViewById(R.id.linear_tipo_pago) as LinearLayout
+        lineartipopago.visibility = View.GONE
 
         var campo1params = campo1.layoutParams
         var campo2params = campo2.layoutParams

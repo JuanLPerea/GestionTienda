@@ -3,6 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/juanl/AndroidStudioProjects/GestionTienda/app/src/main/res/layout/entrada_productos.xml" value="0.29270833333333335" />
+        <entry key="..\:/Users/juanl/AndroidStudioProjects/GestionTienda/app/src/main/res/layout/fragment_clientes.xml" value="0.19746376811594202" />
+        <entry key="..\:/Users/juanl/AndroidStudioProjects/GestionTienda/app/src/main/res/layout/fragment_proveedores.xml" value="0.2427536231884058" />
         <entry key="app/src/main/res/drawable/ic_baseline_cancel_24.xml" value="0.2065" />
         <entry key="app/src/main/res/drawable/ic_baseline_create_24.xml" value="0.184" />
         <entry key="app/src/main/res/drawable/ic_baseline_delete_24.xml" value="0.184" />
