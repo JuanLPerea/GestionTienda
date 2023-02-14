@@ -44,8 +44,8 @@ class ImagesHelper (context: Context){
         val wrapper = ContextWrapper(context)
 
         // Initialize a new file instance to save bitmap object
-        var file = wrapper.getDir("Images", Context.MODE_PRIVATE)
-        file = File(file, "IMAGEN_" + nombreImagen + ".jpg")
+        var file = wrapper.getDir("Datos", Context.MODE_PRIVATE)
+        file = File(file, "Imagen_" + nombreImagen + ".jpg")
 
         try{
             // Compress the bitmap and save in jpg format
@@ -66,7 +66,7 @@ class ImagesHelper (context: Context){
         var bitmap: Bitmap? = null
         System.gc()
         if (archivo == null) {
-            archivo = "Constantes.ARCHIVO_IMAGEN_JUGADOR"
+            archivo = "Producto_generico"
         }
         try {
             val fileInputStream = FileInputStream(archivo)
@@ -94,4 +94,6 @@ class ImagesHelper (context: Context){
             }
         }
     }
+
+
 }

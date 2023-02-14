@@ -2,7 +2,7 @@ package com.example.gestiontienda.Utilidades
 
 import android.content.Context
 import android.content.ContextWrapper
-import android.database.sqlite.SQLiteDatabase
+import com.example.gestiontienda.Utilidades.Utilidades.Companion.zipAll
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.*
@@ -209,10 +209,10 @@ class ExcelHelper {
         // Get the context wrapper
         val wrapper = ContextWrapper(context)
         // Initialize a new file instance to save bitmap object
-        var filesDir = wrapper.getDir("Excel", Context.MODE_PRIVATE)
+        var excelDir = wrapper.getDir("Datos", Context.MODE_PRIVATE)
 
         //get our app file directory
-        val ourAppFileDirectory = filesDir
+        val ourAppFileDirectory = excelDir
         //Check whether it exists or not, and create if does not exist.
         if (ourAppFileDirectory != null && !ourAppFileDirectory.exists()) {
             ourAppFileDirectory.mkdirs()
@@ -231,13 +231,18 @@ class ExcelHelper {
         } catch (e: IOException) {
             e.printStackTrace()
         }
+
+
+         // TODO Guardar fotos en una carpeta o un fichero .zip para poder recuperarlas luego
+         var copiaDir = wrapper.getDir("Copia", Context.MODE_PRIVATE)
+         zipAll("/data/user/0/com.example.gestiontienda/app_Datos", "/data/user/0/com.example.gestiontienda/app_Copia/prueba.zip")
     }
 
      fun getExcelFile(context: Context): File? {
         // Get the context wrapper
         val wrapper = ContextWrapper(context)
         // Initialize a new file instance to save bitmap object
-        var filesDir = wrapper.getDir("Excel", Context.MODE_PRIVATE)
+        var filesDir = wrapper.getDir("Datos", Context.MODE_PRIVATE)
 
         val ourAppFileDirectory = filesDir
         ourAppFileDirectory?.let {
