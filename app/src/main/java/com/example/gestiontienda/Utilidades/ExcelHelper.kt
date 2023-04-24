@@ -238,8 +238,8 @@ class ExcelHelper {
 
 
          // TODO Guardar fotos en una carpeta o un fichero .zip para poder recuperarlas luego
-         var copiaDir = wrapper.getDir("Copia", Context.MODE_PRIVATE)
-         val fecha = LocalDateTime.now().toString().replace(':', '_').replace('.', '_')
+         var fecha = LocalDateTime.now().toString().replace(':', '_').replace('.', '_')
+         fecha = fecha.substring(0, fecha.length- 7)
          val descargas_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
          // Crea 2 archivos de copia de seguridad:
          // 1 en la memoria interna

@@ -30,9 +30,6 @@ class Utilidades {
         fun zipAll(directory: String, zipFile: String) {
             val sourceFile = File(directory)
 
-            println("directory: $directory")
-            println("zipFile: $zipFile")
-
             val inputDirectory = sourceFile
             val outputZipFile = File(zipFile)
 
@@ -46,6 +43,17 @@ class Utilidades {
                     }
                 }
             }
+        }
+
+        fun listaArchivosCopia() : MutableList<String> {
+            var listaArchivos : MutableList<String> = mutableListOf()
+
+            val directorio = File("/data/user/0/com.example.gestiontienda/app_Copia")
+
+            directorio.walkTopDown().forEach { file ->
+                if (file.isFile) listaArchivos.add(file.name)
+            }
+            return listaArchivos
         }
 
 

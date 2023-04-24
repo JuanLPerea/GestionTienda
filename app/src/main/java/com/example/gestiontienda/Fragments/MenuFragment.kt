@@ -1,8 +1,12 @@
 package com.example.gestiontienda.Fragments
 
+import android.app.Activity
 import android.app.Dialog
+import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
+import android.net.Uri
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,19 +17,31 @@ import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
+import com.example.gestiontienda.Adapters.RecyclerCopiaAdapter
+import com.example.gestiontienda.Interfaces.OnCopiaListClicked
+import com.example.gestiontienda.Interfaces.OnItemListClicked
 import com.example.gestiontienda.R
 import com.example.gestiontienda.Utilidades.DatabaseHelper
 import com.example.gestiontienda.Utilidades.ExcelHelper
 import com.example.gestiontienda.Utilidades.Prefs
+import com.example.gestiontienda.Utilidades.Utilidades.Companion.listaArchivosCopia
+import org.apache.poi.sl.draw.geom.Context
 
 
-class MenuFragment  () : Fragment() {
+class MenuFragment() : Fragment(), OnCopiaListClicked {
 
     private lateinit var databaseHelper: DatabaseHelper
     private lateinit var db: SQLiteDatabase
+    private lateinit var archivoCopiaSeguridad: String
 
-    override fun onCreateView (inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val v = inflater.inflate(R.layout.fragment_menu, container, false)
 
         // Instanciar Base de Datos SQLite
@@ -48,7 +64,7 @@ class MenuFragment  () : Fragment() {
 
             val dialog = Dialog(v.context)
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
-            dialog.setCancelable(false)
+            dialog.setCancelable(true)
             dialog.setContentView(R.layout.copia_seguridad_dialog)
 
             val botonCargar = dialog.findViewById(R.id.cargar_copia) as Button
@@ -56,28 +72,89 @@ class MenuFragment  () : Fragment() {
 
             botonCargar.setOnClickListener {
                 // TODO cargar archivo de copia de seguridad
-                // los archivos se cargan únicamente del directorio interno de la APP
-                // TODO recycler view con lista de copias guardadas internamente en la APP
-                // TODO Botón para cargar un archivo de copia de seguridad en cualquier carpeta
+                // recycler view con lista de copias guardadas internamente en la APP
+                // Botón para cargar un archivo de copia de seguridad en cualquier carpeta
+                val dialogLista = Dialog(v.context)
+                dialogLista.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                dialogLista.setCancelable(true)
+                dialog.setContentView(R.layout.cargar_copia_dialog)
 
-                dialog.dismiss()
+                val recyclerLista = dialog.findViewById(R.id.recycler_copiaRV) as RecyclerView
+                val botonSeleccionar =
+                    dialog.findViewById(R.id.seleccionarArchivoCopiaBTN) as Button
+                val botonRestaurarCopia = dialog.findViewById(R.id.restaurarCopiaBTN) as Button
+                val textoArchivoSeleccionado =
+                    dialog.findViewById(R.id.archivoSeleccionadoTV) as TextView
+
+                recyclerLista.setHasFixedSize(true)
+                recyclerLista.layoutManager = LinearLayoutManager(v.context)
+
+                // TODO recuperar lista de archivos de copia de seguridad en la memoria interna
+                var listaArchivos: MutableList<String> = mutableListOf()
+                listaArchivos = listaArchivosCopia()
+
+                val adapterArchivo = RecyclerCopiaAdapter()
+                adapterArchivo.RecyclerCopiaAdapter(listaArchivos, this, textoArchivoSeleccionado)
+                recyclerLista.adapter = adapterArchivo
+
+                botonSeleccionar.setOnClickListener {
+                    // Request code for selecting a ZIP document.
+                    val PICK_ZIP_FILE = 2
+                    val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        type = "application/zip"
+                        // Optionally, specify a URI for the file that should appear in the
+                        // system file picker when it loads.
+                        putExtra(DocumentsContract.EXTRA_INITIAL_URI, 2)
+                    }
+                    startActivityForResult(intent, PICK_ZIP_FILE)
+                }
+
+                botonRestaurarCopia.setOnClickListener {
+                    val dialogConfirmar = Dialog(v.context)
+                    dialogConfirmar.requestWindowFeature(Window.FEATURE_NO_TITLE)
+                    dialogConfirmar.setCancelable(true)
+                    dialogConfirmar.setContentView(R.layout.confirmar_layout)
+
+                    val textoConfirmar = dialogConfirmar.findViewById(R.id.texto_confirmarTV) as TextView
+                    val aceptarConfirmar = dialogConfirmar.findViewById(R.id.boton_confirmar_OK) as Button
+                    val cancelarConfirmar = dialogConfirmar.findViewById(R.id.boton_confirmar_CANCELAR) as Button
+
+                    textoConfirmar.text = "¿Seguro? "
+
+                    aceptarConfirmar.setOnClickListener{
+                        // TODO Restaurar copia de seguridad con el archivo seleccionado
+                        Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
+                        dialogConfirmar.dismiss()
+                        dialog.dismiss()
+                    }
+
+                    cancelarConfirmar.setOnClickListener {
+                        // Cancelar
+                        dialogConfirmar.dismiss()
+                        dialog.dismiss()
+                    }
+                    dialogConfirmar.show()
+                }
+                dialogLista.show()
             }
 
             botonSalvar.setOnClickListener {
                 val excelUtilities = ExcelHelper()
                 val miExcel = excelUtilities.createWorkbook(databaseHelper)
-                excelUtilities.createExcelFile(miExcel , v.context.applicationContext)
-                Toast.makeText(v.context, "Copia Creada, el archivo se ha guardado en 'Descargas'", Toast.LENGTH_LONG).show()
+                excelUtilities.createExcelFile(miExcel, v.context.applicationContext)
+                Toast.makeText(
+                    v.context,
+                    "Copia Creada, el archivo se ha guardado en 'Descargas'",
+                    Toast.LENGTH_LONG
+                ).show()
 
                 // TODO mandar un mail a la dirección indicada en ajustes con el archivo de copia de seguridad
                 dialog.dismiss()
             }
 
             dialog.show()
-
         }
-
-
         return v
     }
 
@@ -107,7 +184,15 @@ class MenuFragment  () : Fragment() {
         val yesBtn = dialog.findViewById(R.id.boton_guardar_tienda) as Button
         yesBtn.setOnClickListener {
 
-            databaseHelper.guardarTienda(db, nombreTienda.text.toString(), direccionTienda.text.toString() , telefonoTienda.text.toString() , emailTienda.text.toString() , cifTienda.text.toString() , otrosTienda.text.toString())
+            databaseHelper.guardarTienda(
+                db,
+                nombreTienda.text.toString(),
+                direccionTienda.text.toString(),
+                telefonoTienda.text.toString(),
+                emailTienda.text.toString(),
+                cifTienda.text.toString(),
+                otrosTienda.text.toString()
+            )
             dialog.dismiss()
         }
         dialog.show()
@@ -121,8 +206,33 @@ class MenuFragment  () : Fragment() {
             val vista = activity!!.findViewById(R.id.pager) as ViewPager2
             ajustesTienda(vista)
 
-            Log.d("Miapp" , "Primera Ejecución")
+            Log.d("Miapp", "Primera Ejecución")
         }
     }
 
+
+    override fun itemListClicked(archivo: String, v: TextView) {
+        // TODO hacer algo cuando pulsamos en un archivo de la lista
+        v.text = archivo
+        archivoCopiaSeguridad = "/data/user/0/com.example.gestiontienda/app_Copia/" + archivo
+    }
+
+    override fun onActivityResult(
+        requestCode: Int, resultCode: Int, resultData: Intent?
+    ) {
+        if (requestCode == 2
+            && resultCode == Activity.RESULT_OK
+        ) {
+            // The result data contains a URI for the document or directory that
+            // the user selected.
+            resultData?.data?.also { uri ->
+                // Perform operations on the document using its URI.
+                var path = uri.lastPathSegment
+                val pos = path!!.indexOf(':') + 1
+                path = path.substring(pos, path.length)
+                Log.d("Miapp", "Has seleccionado el archivo: " + path)
+                archivoCopiaSeguridad = path
+            }
+        }
+    }
 }
