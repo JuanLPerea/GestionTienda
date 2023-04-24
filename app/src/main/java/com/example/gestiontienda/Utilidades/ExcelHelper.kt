@@ -2,10 +2,14 @@ package com.example.gestiontienda.Utilidades
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.os.Environment
+import android.util.Log
 import com.example.gestiontienda.Utilidades.Utilidades.Companion.zipAll
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.*
+import java.time.LocalDateTime
+import java.util.jar.Manifest
 
 class ExcelHelper {
 
@@ -235,8 +239,15 @@ class ExcelHelper {
 
          // TODO Guardar fotos en una carpeta o un fichero .zip para poder recuperarlas luego
          var copiaDir = wrapper.getDir("Copia", Context.MODE_PRIVATE)
-         zipAll("/data/user/0/com.example.gestiontienda/app_Datos", "/data/user/0/com.example.gestiontienda/app_Copia/prueba.zip")
-    }
+         val fecha = LocalDateTime.now().toString().replace(':', '_').replace('.', '_')
+         val descargas_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+         // Crea 2 archivos de copia de seguridad:
+         // 1 en la memoria interna
+         zipAll("/data/user/0/com.example.gestiontienda/app_Datos", "/data/user/0/com.example.gestiontienda/app_Copia/copia" + fecha +".zip")
+         // y 2 en la carpeta de descargas
+         Log.d("Miapp" , descargas_path.toString())
+         zipAll( "/data/user/0/com.example.gestiontienda/app_Datos" , descargas_path.toString() + "/copia_tienda.zip")
+     }
 
      fun getExcelFile(context: Context): File? {
         // Get the context wrapper

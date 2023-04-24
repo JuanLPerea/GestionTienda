@@ -1,10 +1,14 @@
 package com.example.gestiontienda
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.viewpager2.widget.ViewPager2
 import com.example.gestiontienda.Entidades.Tienda
 import com.example.gestiontienda.Utilidades.DatabaseHelper
@@ -23,6 +27,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         ImagesHelper(applicationContext).desactivarModoEstricto()
+
+        setupPermissions()
 
         val pager = findViewById(R.id.pager) as ViewPager2
         val tabLayout = findViewById(R.id.tabLayout) as TabLayout
@@ -55,5 +61,29 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    private fun setupPermissions() {
+        val permission = ContextCompat.checkSelfPermission(this,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE)
+
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            Log.d("MiApp", "Permiso denegado")
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1)
+        } else {
+            Log.d("MiApp", "Permiso concedido")
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                             permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            1 -> {
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                    Log.d("Miapp", "Permission has been denied by user")
+                } else {
+                    Log.d("Miapp", "Permission has been granted by user")
+                }
+            }
+        }
+    }
 
 }

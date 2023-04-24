@@ -47,6 +47,12 @@ class Utilidades {
                 }
             }
         }
+
+
+        fun unzipAll(){
+            // TODO descomprimir el archivo de copia de seguridad y restaurar los datos
+        }
+
     }
 
 }

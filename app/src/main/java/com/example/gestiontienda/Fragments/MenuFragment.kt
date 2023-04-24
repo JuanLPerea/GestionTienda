@@ -10,6 +10,8 @@ import android.view.ViewGroup
 import android.view.Window
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.widget.ViewPager2
 import com.example.gestiontienda.R
@@ -41,9 +43,37 @@ class MenuFragment  () : Fragment() {
         val botonCopiaSeguridad = v.findViewById(R.id.botonCopiaSeguridad) as Button
         botonCopiaSeguridad.setOnClickListener {
 
-            val excelUtilities = ExcelHelper()
-            val miExcel = excelUtilities.createWorkbook(databaseHelper)
-            excelUtilities.createExcelFile(miExcel , v.context.applicationContext)
+            // TODO Hacer Dialog para poder cargar o guardar copia de seguridad
+            // la copia de seguridad se guardará en 'Descargas'
+
+            val dialog = Dialog(v.context)
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+            dialog.setCancelable(false)
+            dialog.setContentView(R.layout.copia_seguridad_dialog)
+
+            val botonCargar = dialog.findViewById(R.id.cargar_copia) as Button
+            val botonSalvar = dialog.findViewById(R.id.guardar_copia) as Button
+
+            botonCargar.setOnClickListener {
+                // TODO cargar archivo de copia de seguridad
+                // los archivos se cargan únicamente del directorio interno de la APP
+                // TODO recycler view con lista de copias guardadas internamente en la APP
+                // TODO Botón para cargar un archivo de copia de seguridad en cualquier carpeta
+
+                dialog.dismiss()
+            }
+
+            botonSalvar.setOnClickListener {
+                val excelUtilities = ExcelHelper()
+                val miExcel = excelUtilities.createWorkbook(databaseHelper)
+                excelUtilities.createExcelFile(miExcel , v.context.applicationContext)
+                Toast.makeText(v.context, "Copia Creada, el archivo se ha guardado en 'Descargas'", Toast.LENGTH_LONG).show()
+
+                // TODO mandar un mail a la dirección indicada en ajustes con el archivo de copia de seguridad
+                dialog.dismiss()
+            }
+
+            dialog.show()
 
         }
 
