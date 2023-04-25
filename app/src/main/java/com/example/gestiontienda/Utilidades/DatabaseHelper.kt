@@ -558,5 +558,25 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         return misSalidas
     }
 
+    fun resetearBD(db: SQLiteDatabase) {
+       //  borrar todo de la base de datos
+        val DELETE_BANCO = "DELETE FROM BANCO"
+        db!!.execSQL(DELETE_BANCO)
+        val DELETE_CAJA = "DELETE FROM CAJA"
+        db!!.execSQL(DELETE_CAJA)
+        val DELETE_CLIENTES = "DELETE FROM CLIENTES"
+        db!!.execSQL(DELETE_CLIENTES)
+        val DELETE_ENTRADAS = "DELETE FROM ENTRADAS"
+        db!!.execSQL(DELETE_ENTRADAS)
+        val DELETE_PRODUCTOS = "DELETE FROM PRODUCTOS"
+        db!!.execSQL(DELETE_PRODUCTOS)
+        val DELETE_PROVEEDORES = "DELETE FROM PROVEEDORES"
+        db!!.execSQL(DELETE_PROVEEDORES)
+        val DELETE_SALIDAS = "DELETE FROM SALIDAS"
+        db!!.execSQL(DELETE_SALIDAS)
+        val DELETE_TIENDA = "DELETE FROM TIENDA"
+        db!!.execSQL(DELETE_TIENDA)
+    }
+
 
 }

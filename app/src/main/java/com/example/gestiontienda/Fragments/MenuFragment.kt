@@ -36,6 +36,9 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
     private lateinit var databaseHelper: DatabaseHelper
     private lateinit var db: SQLiteDatabase
     private lateinit var archivoCopiaSeguridad: String
+    private lateinit var excelUtilities : ExcelHelper
+    private lateinit var textoArchivoCopiaSeguridad : TextView
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +51,9 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
         databaseHelper = DatabaseHelper(activity!!.applicationContext)
         db = databaseHelper.writableDatabase
 
+        // Excel Utilities
+        excelUtilities = ExcelHelper()
+
         // Comprobar primera ejecución
         comprobarPrimeraEjecucion()
 
@@ -59,7 +65,7 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
         val botonCopiaSeguridad = v.findViewById(R.id.botonCopiaSeguridad) as Button
         botonCopiaSeguridad.setOnClickListener {
 
-            // TODO Hacer Dialog para poder cargar o guardar copia de seguridad
+            // Dialog para poder cargar o guardar copia de seguridad
             // la copia de seguridad se guardará en 'Descargas'
 
             val dialog = Dialog(v.context)
@@ -71,30 +77,29 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
             val botonSalvar = dialog.findViewById(R.id.guardar_copia) as Button
 
             botonCargar.setOnClickListener {
-                // TODO cargar archivo de copia de seguridad
+                // cargar archivo de copia de seguridad
                 // recycler view con lista de copias guardadas internamente en la APP
                 // Botón para cargar un archivo de copia de seguridad en cualquier carpeta
                 val dialogLista = Dialog(v.context)
                 dialogLista.requestWindowFeature(Window.FEATURE_NO_TITLE)
                 dialogLista.setCancelable(true)
-                dialog.setContentView(R.layout.cargar_copia_dialog)
+                dialogLista.setContentView(R.layout.cargar_copia_dialog)
 
-                val recyclerLista = dialog.findViewById(R.id.recycler_copiaRV) as RecyclerView
+                val recyclerLista = dialogLista.findViewById(R.id.recycler_copiaRV) as RecyclerView
                 val botonSeleccionar =
-                    dialog.findViewById(R.id.seleccionarArchivoCopiaBTN) as Button
-                val botonRestaurarCopia = dialog.findViewById(R.id.restaurarCopiaBTN) as Button
-                val textoArchivoSeleccionado =
-                    dialog.findViewById(R.id.archivoSeleccionadoTV) as TextView
+                    dialogLista.findViewById(R.id.seleccionarArchivoCopiaBTN) as Button
+                val botonRestaurarCopia = dialogLista.findViewById(R.id.restaurarCopiaBTN) as Button
+                textoArchivoCopiaSeguridad = dialogLista.findViewById(R.id.archivoSeleccionadoTV) as TextView
 
                 recyclerLista.setHasFixedSize(true)
                 recyclerLista.layoutManager = LinearLayoutManager(v.context)
 
-                // TODO recuperar lista de archivos de copia de seguridad en la memoria interna
+                // Recuperar lista de archivos de copia de seguridad en la memoria interna
                 var listaArchivos: MutableList<String> = mutableListOf()
                 listaArchivos = listaArchivosCopia()
 
                 val adapterArchivo = RecyclerCopiaAdapter()
-                adapterArchivo.RecyclerCopiaAdapter(listaArchivos, this, textoArchivoSeleccionado)
+                adapterArchivo.RecyclerCopiaAdapter(listaArchivos, this, textoArchivoCopiaSeguridad)
                 recyclerLista.adapter = adapterArchivo
 
                 botonSeleccionar.setOnClickListener {
@@ -123,9 +128,11 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
                     textoConfirmar.text = "¿Seguro? "
 
                     aceptarConfirmar.setOnClickListener{
-                        // TODO Restaurar copia de seguridad con el archivo seleccionado
+                        // Restaurar copia de seguridad con el archivo seleccionado
+                        excelUtilities.restaurarCopia(archivoCopiaSeguridad, v.context, db)
                         Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
                         dialogConfirmar.dismiss()
+                        dialogLista.dismiss()
                         dialog.dismiss()
                     }
 
@@ -140,7 +147,7 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
             }
 
             botonSalvar.setOnClickListener {
-                val excelUtilities = ExcelHelper()
+
                 val miExcel = excelUtilities.createWorkbook(databaseHelper)
                 excelUtilities.createExcelFile(miExcel, v.context.applicationContext)
                 Toast.makeText(
@@ -211,9 +218,9 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
     }
 
 
-    override fun itemListClicked(archivo: String, v: TextView) {
-        // TODO hacer algo cuando pulsamos en un archivo de la lista
-        v.text = archivo
+    override fun itemListClicked(archivo: String) {
+        // Guardar el path del archivo que hemos seleccionado
+        textoArchivoCopiaSeguridad.text = archivo
         archivoCopiaSeguridad = "/data/user/0/com.example.gestiontienda/app_Copia/" + archivo
     }
 
@@ -232,6 +239,8 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
                 path = path.substring(pos, path.length)
                 Log.d("Miapp", "Has seleccionado el archivo: " + path)
                 archivoCopiaSeguridad = path
+                textoArchivoCopiaSeguridad.text = path
+
             }
         }
     }

@@ -25,7 +25,7 @@ class RecyclerCopiaAdapter : RecyclerView.Adapter<RecyclerCopiaAdapter.ViewHolde
         val item = archivos.get(position)
         holder.bind(item)
         holder.itemView.setOnClickListener {
-            listener.itemListClicked(item, v)
+            listener.itemListClicked(item)
         }
     }
 

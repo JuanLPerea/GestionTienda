@@ -5,5 +5,5 @@ import android.widget.TextView
 
 
 interface OnCopiaListClicked {
-    fun itemListClicked (archivo: String, v: TextView)
+    fun itemListClicked (archivo: String)
 }
