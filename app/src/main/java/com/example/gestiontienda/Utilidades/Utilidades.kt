@@ -37,6 +37,15 @@ class Utilidades {
             val inputDirectory = sourceFile
             val outputZipFile = File(zipFile)
 
+            if (outputZipFile.exists()) {
+                outputZipFile.delete()
+            }
+
+            val existeCarpeta = File("/data/user/0/com.example.gestiontienda/app_Copia")
+            if (!existeCarpeta.exists()) {
+                Files.createDirectory(Paths.get("/data/user/0/com.example.gestiontienda/app_Copia"))
+            }
+
             ZipOutputStream(BufferedOutputStream(FileOutputStream(outputZipFile))).use { zos ->
                 inputDirectory.walkTopDown().forEach { file ->
                     val zipFileName = file.absolutePath.removePrefix(inputDirectory.absolutePath).removePrefix("/")

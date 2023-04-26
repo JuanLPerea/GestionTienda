@@ -28,6 +28,8 @@ import com.example.gestiontienda.Utilidades.DatabaseHelper
 import com.example.gestiontienda.Utilidades.ExcelHelper
 import com.example.gestiontienda.Utilidades.Prefs
 import com.example.gestiontienda.Utilidades.Utilidades.Companion.listaArchivosCopia
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.apache.poi.sl.draw.geom.Context
 
 
@@ -129,8 +131,13 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
 
                     aceptarConfirmar.setOnClickListener{
                         // Restaurar copia de seguridad con el archivo seleccionado
-                        excelUtilities.restaurarCopia(archivoCopiaSeguridad, v.context, db)
-                        Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
+                        // Lanzamos una corrutina para que no bloquee el thread principal
+                        // Ya que este proceso puede tardar bastante tiempo
+                        GlobalScope.launch {
+                            textoConfirmar.text = "Restaurando... "
+                            excelUtilities.restaurarCopia(archivoCopiaSeguridad, v.context, db)
+                            Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
+                        }
                         dialogConfirmar.dismiss()
                         dialogLista.dismiss()
                         dialog.dismiss()

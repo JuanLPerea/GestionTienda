@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.os.Environment
 import android.util.Log
 import android.widget.Toast
+import com.example.gestiontienda.Entidades.*
 import com.example.gestiontienda.Utilidades.Utilidades.Companion.zipAll
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -94,10 +95,11 @@ class ExcelHelper {
         createCell(encabezadoProductos, 0, "NOMBREPRODUCTO")
         createCell(encabezadoProductos, 1, "CODIGOPRODUCTO")
         createCell(encabezadoProductos, 2, "RUTAFOTOPRODUCTO")
-        createCell(encabezadoProductos, 3, "PRECIOCOMPRAPRODUCTO")
-        createCell(encabezadoProductos, 4, "PRECIOVENTAPRODUCTO")
-        createCell(encabezadoProductos, 5, "IVAPRODUCTO")
-        createCell(encabezadoProductos, 6, "MARGENPRODUCTO")
+        createCell(encabezadoProductos, 3, "STOCKPRODUCTO")
+        createCell(encabezadoProductos, 4, "PRECIOCOMPRAPRODUCTO")
+        createCell(encabezadoProductos, 5, "PRECIOVENTAPRODUCTO")
+        createCell(encabezadoProductos, 6, "IVAPRODUCTO")
+        createCell(encabezadoProductos, 7, "MARGENPRODUCTO")
 
         val listaProductos = databaseHelper.obtenerProductos(db, "", "")
         listaProductos.forEachIndexed() { index, producto ->
@@ -105,10 +107,11 @@ class ExcelHelper {
             createCell(rowProducto, 0, producto.nombreProducto)
             createCell(rowProducto, 1, producto.codigoProducto)
             createCell(rowProducto, 2, producto.rutafotoProducto)
-            createCell(rowProducto, 3, producto.precioCompraProducto.toString())
-            createCell(rowProducto, 4, producto.precioVentaProducto.toString())
-            createCell(rowProducto, 5, producto.ivaProducto.toString())
-            createCell(rowProducto, 6, producto.margenProducto.toString())
+            createCell(rowProducto, 3, producto.stockProducto.toString().replace('.', ','))
+            createCell(rowProducto, 4, producto.precioCompraProducto.toString().replace('.', ','))
+            createCell(rowProducto, 5, producto.precioVentaProducto.toString().replace('.', ','))
+            createCell(rowProducto, 6, producto.ivaProducto.toString().replace('.', ','))
+            createCell(rowProducto, 7, producto.margenProducto.toString().replace('.', ','))
 
         }
 
@@ -165,10 +168,10 @@ class ExcelHelper {
             createCell(rowEntrada, 2, entrada.tipoEntrada)
             createCell(rowEntrada, 3, entrada.proveedorEntrada)
             createCell(rowEntrada, 4, entrada.productoEntrada)
-            createCell(rowEntrada, 5, entrada.unidadesEntrada.toString())
-            createCell(rowEntrada, 6, entrada.precioEntrada.toString())
+            createCell(rowEntrada, 5, entrada.unidadesEntrada.toString().replace('.', ','))
+            createCell(rowEntrada, 6, entrada.precioEntrada.toString().replace('.', ','))
             createCell(rowEntrada, 7, entrada.cargo)
-            createCell(encabezado_entradas, 8, entrada.iva.toString())
+            createCell(encabezado_entradas, 8, entrada.iva.toString().replace('.', ','))
         }
 
         // Añadir lista de salidas en su tabla correspondiente
@@ -193,8 +196,8 @@ class ExcelHelper {
             createCell(rowSalida, 2, salida.tipoSalida)
             createCell(rowSalida, 3, salida.proveedorSalida)
             createCell(rowSalida, 4, salida.productoSalida)
-            createCell(rowSalida, 5, salida.unidadesSalida.toString())
-            createCell(rowSalida, 6, salida.precioSalida.toString())
+            createCell(rowSalida, 5, salida.unidadesSalida.toString().replace('.', ','))
+            createCell(rowSalida, 6, salida.precioSalida.toString().replace('.', ','))
             createCell(rowSalida, 7, salida.cargo)
             createCell(rowSalida, 8, salida.iva.toString())
         }
@@ -242,8 +245,7 @@ class ExcelHelper {
         // Guardar fotos en una carpeta o un fichero .zip para poder recuperarlas luego
         var fecha = LocalDateTime.now().toString().replace(':', '_').replace('.', '_')
         fecha = fecha.substring(0, fecha.length - 7)
-        val descargas_path =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        val descargas_path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         // Crea 2 archivos de copia de seguridad:
         // 1 en la memoria interna
         zipAll(
@@ -543,7 +545,7 @@ class ExcelHelper {
         }
     }
 
-    fun restaurarCopia(archivoCopiaSeguridad: String, context: Context, db: SQLiteDatabase) {
+    suspend fun restaurarCopia(archivoCopiaSeguridad: String, context: Context, db: SQLiteDatabase) : String {
 
         // TODO comprobar si el archivo es válido
         val archivoCopia = File(archivoCopiaSeguridad)
@@ -564,7 +566,7 @@ class ExcelHelper {
                 File("/data/user/0/com.example.gestiontienda/app_Datos/copia_tienda.xlsx")
             val miHojaExcel = retrieveWorkbook(context, archivoExcel)
 
-            // TODO Borrar datos en SQLite
+            // Borrar datos en SQLite
             val databaseHelper = DatabaseHelper(context)
             databaseHelper.resetearBD(db)
 
@@ -574,7 +576,120 @@ class ExcelHelper {
                 "dato de dentro del excel: " + miHojaExcel!!.getSheetAt(0).getRow(0).getCell(0)
                     .toString()
             )
+
+            // Datos de la tienda
+            databaseHelper.guardarTienda(db,
+                miHojaExcel!!.getSheetAt(0).getRow(0).getCell(1).toString(),
+                miHojaExcel!!.getSheetAt(0).getRow(1).getCell(1).toString(),
+                miHojaExcel!!.getSheetAt(0).getRow(2).getCell(1).toString(),
+                miHojaExcel!!.getSheetAt(0).getRow(3).getCell(1).toString(),
+                miHojaExcel!!.getSheetAt(0).getRow(4).getCell(1).toString(),
+                miHojaExcel!!.getSheetAt(0).getRow(5).getCell(1).toString()
+            )
+            // Recuperar datos de los productos
+            var n = 1
+            do {
+                var dato = miHojaExcel!!.getSheetAt(1).getRow(n).getCell(0).toString()
+                val producto = Producto(
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(1).toString(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(2).toString(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(3).toString().replace(',', '.').toFloat(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(4).toString().replace(',', '.').toFloat(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(5).toString().replace(',', '.').toFloat(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(6).toString().toInt(),
+                    miHojaExcel!!.getSheetAt(1).getRow(n).getCell(7).toString().replace(',', '.').toFloat()
+                )
+                databaseHelper.crearProducto(db, producto)
+            } while (dato != "")
+
+            // Datos de los clientes
+            n = 1
+            do {
+                var dato = miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString()
+                val cliente = Cliente(
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().toInt(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString()
+
+                )
+                databaseHelper.guardarCliente(db, cliente)
+            } while (dato != "")
+
+
+            // Datos de los Proveedores
+            n = 1
+            do {
+                var dato = miHojaExcel!!.getSheetAt(3).getRow(n).getCell(0).toString()
+                val proveedor = Proveedor(
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().toInt(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString()
+
+                )
+                databaseHelper.guardarProveedor(db, proveedor)
+            } while (dato != "")
+
+            // Guardar datos de entradas
+            n = 1
+            do {
+                var dato = miHojaExcel!!.getSheetAt(3).getRow(n).getCell(0).toString()
+                val entrada = Entrada(
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().replace(',','.').toFloat(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().replace(',','.').toFloat(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().toInt()
+
+                )
+                databaseHelper.guardarEntrada(db, entrada)
+            } while (dato != "")
+
+
+            // Guardar datos de salidas
+            n = 1
+            do {
+                var dato = miHojaExcel!!.getSheetAt(3).getRow(n).getCell(0).toString()
+                val salida = Salida(
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().replace(',','.').toFloat(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().replace(',','.').toFloat(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString(),
+                    miHojaExcel!!.getSheetAt(2).getRow(n).getCell(0).toString().toInt()
+
+                )
+                databaseHelper.guardarSalida(db, salida)
+            } while (dato != "")      
+            
+            
+            
         }
+
+        return "OK"
     }
 
 }

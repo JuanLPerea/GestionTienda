@@ -578,5 +578,17 @@ class DatabaseHelper (context: Context) : SQLiteOpenHelper(context, "DB_TIENDA",
         db!!.execSQL(DELETE_TIENDA)
     }
 
+    fun guardarEntrada(db: SQLiteDatabase, entrada: Entrada) {
+        // Añadir entrada en la BD
+        val UPDATE_ENTRADA = "INSERT INTO ENTRADAS VALUES ('" +entrada.idEntrada + "' , '" + entrada.fechaEntrada + "' , '" + entrada.tipoEntrada + "' , '" + entrada.proveedorEntrada + "' , '" + entrada.productoEntrada + "' , '" + entrada.unidadesEntrada+ "' , '" +entrada.precioEntrada + "' , '" + entrada.cargo + "' , '" + entrada.iva  + "')"
+        db!!.execSQL(UPDATE_ENTRADA)
+    }
+
+    fun guardarSalida(db: SQLiteDatabase, salida: Salida) {
+        // Añadir salida en la BD
+        val UPDATE_SALIDA = "INSERT INTO ENTRADAS VALUES ('" +salida.idSalida + "' , '" + salida.fechaSalida + "' , '" + salida.tipoSalida + "' , '" + salida.proveedorSalida + "' , '" + salida.productoSalida + "' , '" + salida.unidadesSalida+ "' , '" +salida.precioSalida + "' , '" + salida.cargo + "' , '" + salida.iva  + "')"
+        db!!.execSQL(UPDATE_SALIDA)
+    }
+
 
 }
