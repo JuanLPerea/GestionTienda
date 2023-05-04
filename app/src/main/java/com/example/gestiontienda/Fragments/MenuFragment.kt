@@ -136,8 +136,8 @@ class MenuFragment() : Fragment(), OnCopiaListClicked {
                         GlobalScope.launch {
                             textoConfirmar.text = "Restaurando... "
                             excelUtilities.restaurarCopia(archivoCopiaSeguridad, v.context, db)
-                            Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
-                        }
+                       }
+                        Toast.makeText(context, "Copia Restaurada", Toast.LENGTH_LONG).show()
                         dialogConfirmar.dismiss()
                         dialogLista.dismiss()
                         dialog.dismiss()
